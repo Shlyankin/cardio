@@ -1,4 +1,12 @@
 /.idea/
 /venv/Scripts/
 /venv/
-/new_venv/
+!/new_venv/
+/new_venv/*
+!/new_venv/Lib/
+/new_venv/Lib/*
+!/new_venv/Lib/site-packages/
+/new_venv/Lib/site-packages/*
+!/new_venv/Lib/site-packages/cardio/
+/new_venv/Lib/site-packages/cardio/*
+!/new_venv/Lib/site-packages/cardio/core/
