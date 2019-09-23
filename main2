@@ -1,0 +1,38 @@
+import os
+import sys
+import numpy as np
+import tensorflow as tf
+import cardio.batchflow as bf
+from cardio import EcgBatch
+from cardio.models.metrics import classification_report
+
+import warnings
+warnings.filterwarnings('ignore')
+
+SIGNALS_PATH = "C:\\Users\\Компьютер\\Desktop\\Научка\\qt-database-1.0.0" #set path to QT database
+SIGNALS_MASK = os.path.join(SIGNALS_PATH, "*.hea")
+
+index = bf.FilesIndex(path=SIGNALS_MASK, no_ext=True, sort=True)
+dtst = bf.Dataset(index, batch_class=EcgBatch)
+
+from PanTompkinsAlgorithm import testPipeline
+pipeline = testPipeline(batch_size=1)
+ppl_inits = (dtst >> pipeline).run()
+"""
+pipeline = HMM_preprocessing_pipeline()
+ppl_inits = (dtst >> pipeline).run()
+
+pipeline = my_HMM_train_pipeline(ppl_inits)
+ppl_train = (dtst >> pipeline).run()
+ppl_train.save_model("HMM", path="QRS_model_16.dill")
+"""
+
+
+"""
+pipeline = hmm_preprocessing_pipeline()
+ppl_inits = (dtst >> pipeline).run()
+
+pipeline = hmm_train_pipeline(ppl_inits)
+ppl_train = (dtst >> pipeline).run()
+"""
+

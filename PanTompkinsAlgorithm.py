@@ -1,0 +1,51 @@
+import numpy as np
+import hmmlearn.hmm as hmm
+
+from functools import partial
+from cardio.models.hmm import HMModel, prepare_hmm_input
+from cardio import batchflow as bf
+from my_tools import get_annsamples, expand_annotation, get_anntypes, prepare_means_covars, prepare_transmat_startprob
+
+def testPipeline(batch_size=20):
+    return (bf.Pipeline()
+            .load(fmt='wfdb', components=["signal", "meta"])
+            .my_pan_tompkins()
+            .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True)
+            )
+def PanTompkinsPipeline():
+    return (bf.Pipeline()
+            .init_variable("filtered_signal", init_on_each_run=list)
+            .load(fmt='wfdb', components=["signal", "meta"])
+            .low_freq_filter(src="signal", dst="filtered_signal")
+            .high_freq_filter(src="signal", dst="filtered_signal")
+            .compute_derivative(src="signal", dst="filtered_signal")
+            .squared(src="signal", dst="filtered_signal")
+            .update_variable("filtered_signal", bf.B("filtered_signal"), mode='e')
+            .run())
+
+
+def low_freq_filter(signal):
+    result = np.zeros(len(signal) - 12)
+    for index in range(len(result)):
+        result[index] = signal[index + 12] - 2 * signal[index + 6] + signal[index]
+        if index > 1:
+            result[index] += 2 * result[index - 1]
+        if index > 2:
+            result[index] -= result[index - 2]
+    return result
+
+
+def high_freq_filter(signal):
+    result = np.zeros(len(signal) - 32)
+    for index in range(len(result)):
+        result[index] = 32*signal[index + 16] + 32 * signal[index + 32] - signal[index]
+        if index > 1:
+            result[index] -= result[index - 1]
+    return result
+
+
+def compute_derivative(signal):
+    result = np.zeros(len(signal) - 4)
+    for index in range(len(result)):
+        result[index] = 0.125 * (2*signal[index + 4] + signal[index + 3] - signal[index + 1] - 2*signal[signal])
+    return result

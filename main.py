@@ -31,7 +31,7 @@ ppl_inits = (dtst >> pipeline).run()
 
 pipeline = my_HMM_train_pipeline(ppl_inits)
 ppl_train = (dtst >> pipeline).run()
-ppl_train.save_model("HMM", path="my_QRS_model16.dill")
+ppl_train.save_model("HMM", path="QRS_model_16.dill")
 """
 
 
@@ -48,21 +48,23 @@ ppl_train = (dtst >> pipeline).run()
 from my_tools import expand_annotation
 from cardio.pipelines import hmm_predict_pipeline
 from my_tools import calculate_sensitivity
-model_name = "my_QRS_model16.dill"
-batch:EcgBatch = (dtst >> my_HMM_predict_pipeline(model_name, annot="hmm_annotation")).next_batch()
-calculate_sensitivity(batch)
-
-#[3, 5, 8, 11, 14, 16], [8, 9, 10], [11, 12, 13], [14, 15]
+model_name = "QRS_model_6.dill"
+#[3, 5, 8, 11, 14, 16]
 #[3, 5, 11, 14, 17, 19]
-all_states = {"my_QRS_model6.dill" : [0, 1, 2, 3, 4, 5],
-              "my_QRS_model16.dill" : [3, 5, 8, 11, 14, 16],
-              "QRS_model18.dill" : [3, 5, 11, 14, 17, 19]}
-states = all_states[model_name]
-batch.my_show_ecg(np.array([
-    np.array(list(range(states[0])), np.int64),
-    #np.array(list(range(states[0], states[1])), np.int64),
-    np.array(list(range(states[1], states[2])), np.int64),
-    np.array(list(range(states[3], states[4])), np.int64)
-    ]),
-    'sel100', start=12, end=17, annot="hmm_annotation")
+all_states = {"QRS_model_6.dill": [1, 2, 3, 4, 5, 6],
+              "QRS_model_16.dill": [3, 5, 8, 11, 14, 16],
+              "QRS_model_18.dill": [3, 5, 11, 14, 17, 19]}
+for model_name in all_states.keys():
+    states = all_states[model_name]
+    batch:EcgBatch = (dtst >> my_HMM_predict_pipeline(model_name, annot="hmm_annotation")).next_batch()
+    parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0)
+    print(model_name + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+    batch.my_show_ecg(np.array([
+        np.array(list(range(states[0])), np.int64),
+        #np.array(list(range(states[0], states[1])), np.int64),
+        np.array(list(range(states[1], states[2])), np.int64),
+        np.array(list(range(states[3], states[4])), np.int64)
+        ]),
+        'sel100', start=12, end=17, annot="hmm_annotation")
+
 

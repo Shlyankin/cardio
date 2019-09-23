@@ -3,16 +3,49 @@ import matplotlib.pyplot as plt
 from cardio import EcgBatch
 
 
-def calculate_sensitivity(batch):
-    anntypes = batch.annotation["anntype"]
-    annsamps = batch.annotation["annsamp"]
-    for annsamp, anntype, hmm_annotation in annsamps, anntypes, batch.hmm_annotation:
+def calculate_sensitivity(batch, states, state_num):
+    parameters = {"tp": 0, "fn": 0, "fp": 0}
+    for i in range(len(batch.annotation)):
+        anntype = batch.annotation[i]["anntype"]
+        annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
-        parameters = tp_fn_fp_count(true_annot=expanded, annot=hmm_annotation)
-    return float(parameters["tp"]) / (parameters["tp"] + parameters["fn"])
+        new_parameters = tp_fn_fp_count(expanded, batch.hmm_annotation[i], states, state_num)
+        parameters["tp"] += new_parameters["tp"]
+        parameters["fn"] += new_parameters["fn"]
+        parameters["fp"] += new_parameters["fp"]
+    return {"sensitivity": float(parameters["tp"]) / (parameters["tp"] + parameters["fn"]),
+            "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"])}
 
-def tp_fn_fp_count(true_annot, annot):
-    return {"tp" : 100, "fn" : 100, "fp" : 100}
+
+def tp_fn_fp_count(true_annot, annot, states, state_num):
+    true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
+                                                                            state_num + 1)), np.int64))
+    intervals = find_intervals_borders(annot, np.array(list(range(states[state_num] if state_num != 0 else 0,
+                                                                  states[state_num])), np.int64))
+    tp = 0
+    for i in range(len(true_intervals[0])):
+        for j in range(len(intervals[0])):
+            if abs(true_intervals[0][i] - intervals[0][j]) < 30 and abs(true_intervals[1][i] - intervals[1][j]) < 30:
+                tp += 1
+                break
+    fn = len(true_intervals[0]) - tp
+    fp = len(intervals[0]) - tp
+    return {"tp": tp, "fn": fn, "fp": fp}
+
+
+def find_intervals_borders(hmm_annotation, inter_val):
+    intervals = np.zeros(hmm_annotation.shape, dtype=np.int8)
+    for val in inter_val:
+        intervals = np.logical_or(intervals, (hmm_annotation == val).astype(np.int8)).astype(np.int8)
+    masque = np.diff(intervals)
+    starts = np.where(masque == 1)[0] + 1
+    ends = np.where(masque == -1)[0] + 1
+    if np.any(inter_val == hmm_annotation[:1]):
+        ends = ends[1:]
+    if np.any(inter_val == hmm_annotation[-1:]):
+        starts = starts[:-1]
+    return starts, ends
+
 
 def prepare_means_covars(hmm_features, clustering, states=(3, 5, 11, 14, 17, 19), num_states=19, num_features=3):
     """This function is specific to the task and the model configuration, thus contains hardcode.
@@ -31,15 +64,17 @@ def prepare_means_covars(hmm_features, clustering, states=(3, 5, 11, 14, 17, 19)
 
     return means, covariances
 
+
 def prepare_transmat_startprob(states=(3, 5, 11, 14, 17, 19)):
     """ This function is specific to the task and the model configuration, thus contains hardcode.
     """
     # Transition matrix - each row should add up tp 1
-    transition_matrix = np.diag(states[5] * [14 / 15.0]) + np.diagflat((states[5]-1) * [1 / 15.0], 1) + np.diagflat([1 / 15.0], -(states[5]-1))
+    transition_matrix = np.diag(states[5] * [14 / 15.0]) + np.diagflat((states[5] - 1) * [1 / 15.0], 1) + np.diagflat(
+        [1 / 15.0], -(states[5] - 1))
 
     # We suppose that absence of P-peaks is possible
-    transition_matrix[states[3]-1, states[3]] = 0.9 * 1 / 15.0
-    transition_matrix[states[3]-1, states[4]] = 0.1 * 1 / 15.0
+    transition_matrix[states[3] - 1, states[3]] = 0.9 * 1 / 15.0
+    transition_matrix[states[3] - 1, states[4]] = 0.1 * 1 / 15.0
 
     # Initial distribution - should add up to 1
     start_probabilities = np.array(states[5] * [1 / np.float(states[5])])
@@ -74,6 +109,7 @@ def expand_annotation(annsamp, anntype, length):
             s = anntype[j]
 
     return annot_expand
+
 
 def get_annsamples(batch):
     """Get annsamples from annotation
