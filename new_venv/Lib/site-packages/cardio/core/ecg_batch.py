@@ -1708,8 +1708,33 @@ class EcgBatch(bf.Batch):
                 for j in range(N):
                     res[i] += signal[i + j]
             return res / N
+        def find_intervals(signal, pks):
+            pks = np.insert(pks, 0, 0)
+            pks = np.append(pks, len(signal) - 1)
+            starts = []
+            ends = []
+            for i in range(1, len(pks)):
+                mean_value = signal[pks[i - 1] : pks[i]].max() /1.5
+                flag = False if i != 1 else True
+                for j in range(pks[i - 1], pks[i]):
+                    if not flag and signal[j] < mean_value:
+                        ends.append(j)
+                        flag = True
+                        if i == len(pks) - 1:
+                            flag = False
+                            break
+                    if flag and signal[j] > mean_value:
+                        starts.append(j)
+                        flag = False
+                        break
+                if i != 1 and flag:
+                     ends.pop(len(ends) - 1)
+            return np.array(starts), np.array(ends)
+
+
+
         def find_peaks(signal):
-            pks, properties = scipy.signal.find_peaks(signal, distance=32)
+            pks, _ = scipy.signal.find_peaks(signal, distance=32)
             peaki = signal[0]
             noise_level = 0
             peak_index = []
@@ -1730,7 +1755,7 @@ class EcgBatch(bf.Batch):
 
         i = self.get_pos(None, "signal", index)
         x, meta = self.signal[0][i], self.meta[i]
-        plt.plot(x[0:1000])
+        plt.plot(x[100:200])
         plt.show()
         x1 = low_freq_filter(x)
         plt.plot(x1[0:1000])
@@ -1746,14 +1771,16 @@ class EcgBatch(bf.Batch):
         plt.show()
         N = 32
         x5 = moving_window_average(x4, N)
-        plt.plot(x5[0:1000])
+        plt.plot(x5[60:160])
         plt.show()
         p_sig, _ = find_peaks(x5)
+        p_sig = p_sig + 40
+        starts_qrs, ends_qrs = find_intervals(x5, p_sig)
         # p_sig = peakdet(x, 0.5)[0]
-        p = np.zeros(len(x))
-        for i in p_sig + 40:
-            p[int(i)] = 1
-        plt.plot(p[0:1000])
+        p = np.zeros(len(starts_qrs))
+        for i in range(len(starts_qrs)):
+            p[starts_qrs[i] : ends_qrs[i]] = 1
+        plt.plot(p[40:200])
         plt.show()
         1
 
