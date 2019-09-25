@@ -8,8 +8,10 @@ from my_tools import get_annsamples, expand_annotation, get_anntypes, prepare_me
 
 def testPipeline(batch_size=20):
     return (bf.Pipeline()
+            .init_variable("qrs_annotation", init_on_each_run=list)
             .load(fmt='wfdb', components=["signal", "meta"])
-            .my_pan_tompkins()
+            .my_pan_tompkins(dst="qrs_annotation")
+            .update_variable("qrs_annotation", bf.B("qrs_annotation"), mode='e')
             .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True)
             )
 def PanTompkinsPipeline():
