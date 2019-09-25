@@ -18,7 +18,7 @@ from cardio.pipelines import hmm_preprocessing_pipeline, hmm_train_pipeline
 import warnings
 warnings.filterwarnings('ignore')
 
-SIGNALS_PATH = "C:\\Users\\Компьютер\\Desktop\\Научка\\qt-database-1.0.0" #set path to QT database
+SIGNALS_PATH = "qt-database-1.0.0" #set path to QT database
 SIGNALS_MASK = os.path.join(SIGNALS_PATH, "*.hea")
 
 index = bf.FilesIndex(path=SIGNALS_MASK, no_ext=True, sort=True)
