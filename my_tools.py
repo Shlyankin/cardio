@@ -3,18 +3,19 @@ import matplotlib.pyplot as plt
 from cardio import EcgBatch
 
 
-def calculate_sensitivity(batch, states, state_num):
+def calculate_sensitivity(batch, states, state_num, annot):
     parameters = {"tp": 0, "fn": 0, "fp": 0}
     for i in range(len(batch.annotation)):
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
-        new_parameters = tp_fn_fp_count(expanded, batch.hmm_annotation[i], states, state_num)
+        new_parameters = tp_fn_fp_count(expanded, batch.get(component=annot)[i], states, state_num)
         parameters["tp"] += new_parameters["tp"]
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
     return {"sensitivity": float(parameters["tp"]) / (parameters["tp"] + parameters["fn"]),
             "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"])}
+
 
 
 def tp_fn_fp_count(true_annot, annot, states, state_num):

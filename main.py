@@ -57,7 +57,7 @@ all_states = {"QRS_model_6.dill": [1, 2, 3, 4, 5, 6],
 for model_name in all_states.keys():
     states = all_states[model_name]
     batch:EcgBatch = (dtst >> my_HMM_predict_pipeline(model_name, annot="hmm_annotation")).next_batch()
-    parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0)
+    parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0, "hmm_annotation")
     print(model_name + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
     batch.my_show_ecg(np.array([
         np.array(list(range(states[0])), np.int64),
