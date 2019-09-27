@@ -6,7 +6,17 @@ from cardio.models.hmm import HMModel, prepare_hmm_input
 from cardio import batchflow as bf
 from my_tools import get_annsamples, expand_annotation, get_anntypes, prepare_means_covars, prepare_transmat_startprob
 
+
+
 def testPipeline(batch_size=20):
+    return (bf.Pipeline()
+            .init_variable("qrs_annotation", init_on_each_run=list)
+            .load(fmt='wfdb', components=["signal", "meta"])
+            .test(dst="qrs_annotation")
+            .update_variable("qrs_annotation", bf.B("qrs_annotation"), mode='e')
+            .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True)
+            )
+def PanTompkinsPipeline(batch_size=20):
     return (bf.Pipeline()
             .init_variable("qrs_annotation", init_on_each_run=list)
             .load(fmt='wfdb', components=["signal", "meta"])
@@ -14,16 +24,6 @@ def testPipeline(batch_size=20):
             .update_variable("qrs_annotation", bf.B("qrs_annotation"), mode='e')
             .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True)
             )
-def PanTompkinsPipeline():
-    return (bf.Pipeline()
-            .init_variable("filtered_signal", init_on_each_run=list)
-            .load(fmt='wfdb', components=["signal", "meta"])
-            .low_freq_filter(src="signal", dst="filtered_signal")
-            .high_freq_filter(src="signal", dst="filtered_signal")
-            .compute_derivative(src="signal", dst="filtered_signal")
-            .squared(src="signal", dst="filtered_signal")
-            .update_variable("filtered_signal", bf.B("filtered_signal"), mode='e')
-            .run())
 
 
 def low_freq_filter(signal):
