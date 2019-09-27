@@ -6,10 +6,11 @@ from cardio import EcgBatch
 def calculate_sensitivity(batch, states, state_num, annot):
     parameters = {"tp": 0, "fn": 0, "fp": 0}
     for i in range(len(batch.annotation)):
+        error = batch.meta[i]["fs"] / 10
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
-        new_parameters = tp_fn_fp_count(expanded, batch.get(component=annot)[i], states, state_num)
+        new_parameters = tp_fn_fp_count(expanded, batch.get(component=annot)[i], states, state_num, error=error)
         parameters["tp"] += new_parameters["tp"]
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
@@ -18,7 +19,7 @@ def calculate_sensitivity(batch, states, state_num, annot):
 
 
 
-def tp_fn_fp_count(true_annot, annot, states, state_num):
+def tp_fn_fp_count(true_annot, annot, states, state_num, error):
     true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
                                                                             state_num + 1)), np.int64))
     intervals = find_intervals_borders(annot, np.array(list(range(states[state_num] if state_num != 0 else 0,
@@ -26,7 +27,7 @@ def tp_fn_fp_count(true_annot, annot, states, state_num):
     tp = 0
     for i in range(len(true_intervals[0])):
         for j in range(len(intervals[0])):
-            if abs(true_intervals[0][i] - intervals[0][j]) < 30 and abs(true_intervals[1][i] - intervals[1][j]) < 30:
+            if abs(true_intervals[0][i] - intervals[0][j]) < error and abs(true_intervals[1][i] - intervals[1][j]) < error:
                 tp += 1
                 break
     fn = len(true_intervals[0]) - tp

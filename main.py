@@ -39,21 +39,20 @@ ppl_train = (dtst >> pipeline).run()
 ppl_train.save_model("HMM", path="QRS_model_16.dill")
 """
 
-model_name = "QRS_model_6.dill"
 #[3, 5, 8, 11, 14, 16]
 #[3, 5, 11, 14, 17, 19]
-all_states = {"QRS_model_6.dill": [1, 2, 3, 4, 5, 6],
-              "QRS_model_16.dill": [3, 5, 8, 11, 14, 16],
-              "QRS_model_18.dill": [3, 5, 11, 14, 17, 19]}
+all_states = {"QRS_model_6": [1, 2, 3, 4, 5, 6],
+              "QRS_model_16": [3, 5, 8, 11, 14, 16],
+              "QRS_model_18": [3, 5, 11, 14, 17, 19]}
 process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
-    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline(model_name, annot="hmm_annotation" + model_name[0:12])
+    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline(model_name + ".dill", annot="hmm_annotation" + model_name)
 process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
-batch:EcgBatch = (dtst >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
+batch = (dtst >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 for model_name in all_states.keys():
     states = all_states[model_name]
-    parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0, "hmm_annotation" + model_name[0:12])
-    print(model_name + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+    parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0, "hmm_annotation" + model_name)
+    print(model_name + " \tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
     """
     #show example Annotated ECG
     batch.my_show_ecg(np.array([
@@ -65,6 +64,6 @@ for model_name in all_states.keys():
         'sel100', start=12, end=17, annot="hmm_annotation")
     """
 parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0, "pan_tomp_annotation")
-print("Pan-Tompkins" + "\t\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
 
 
