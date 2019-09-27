@@ -19,3 +19,9 @@ QRS_model_6 	sensitivity= 0.691863385233551	specificity= 0.6844040343816764
 QRS_model_16 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
 QRS_model_18 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
 Pan-Tompkins	sensitivity= 0.8410346559517831	specificity= 0.8400642151206542
+
+
+QRS_model_6 	sensitivity= 0.691863385233551	specificity= 0.6844040343816764
+QRS_model_16 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
+QRS_model_18 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
+Pan-Tompkins	sensitivity= 0.8516825715720744	specificity= 0.850870590596618
