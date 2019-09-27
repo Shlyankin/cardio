@@ -2,3 +2,8 @@ QRS_model_6.dill    sensitivity= 0.9156202913108991	specificity= 0.5884061713252
 QRS_model_16.dill   sensitivity= 0.9927674535409342	specificity= 0.8918065331167659
 QRS_model_18.dill   sensitivity= 0.9924660974384731	specificity= 0.98225381518119
 Pan-Tompkins	sensitivity= 0.9658061785865425	specificity= 0.918908036720889
+
+QRS_model_6.dill	sensitivity= 0.8417378201908589	specificity= 0.8326625925373876
+QRS_model_16.dill	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
+QRS_model_18.dill	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
+Pan-Tompkins	sensitivity= 0.8545956805625314	specificity= 0.8427439326399208
