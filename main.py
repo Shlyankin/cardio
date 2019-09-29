@@ -46,7 +46,7 @@ all_states = {"QRS_model_6": [1, 2, 3, 4, 5, 6],
               "QRS_model_18": [3, 5, 11, 14, 17, 19]}
 process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
-    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline(model_name + ".dill", annot="hmm_annotation" + model_name)
+    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline("models\\1\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
 process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
 batch = (dtst >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 for model_name in all_states.keys():

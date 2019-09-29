@@ -42,7 +42,7 @@ def HMM_preprocessing_pipeline(batch_size=20):
             .update_variable(features, bf.B(features), mode='e'))
 
 def HMM_train_pipeline(hmm_preprocessed, batch_size=20, features="hmm_features", channel_ix=0,
-                       n_iter=25, random_state=42, model_name='HMM'):
+                       n_iter=25, random_state=42, model_name='HMM', states=(3, 5, 8, 11, 14, 16)):
     """Train pipeline for Hidden Markov Model.
 
     This pipeline trains hmm model to isolate QRS, PQ and QT segments.
@@ -63,6 +63,15 @@ def HMM_train_pipeline(hmm_preprocessed, batch_size=20, features="hmm_features",
         Number of learning iterations for ``HMModel``.
     random_state: int
         Random state for ``HMModel``.
+    states: list
+        States of Markov model.
+            0     to states[0] = QRS.
+        states[0] to states[1] = ST.
+        states[1] to states[2] = T.
+        states[2] to states[3] = ISO.to
+        states[3] to states[4] = P.
+        states[4] to states[5] = PQ.
+        Default value is (3, 5, 8, 11, 14, 16).
 
     Returns
     -------
@@ -74,8 +83,6 @@ def HMM_train_pipeline(hmm_preprocessed, batch_size=20, features="hmm_features",
                                    in hmm_preprocessed.get_variable(features)])
     anntype = hmm_preprocessed.get_variable("anntypes")
     annsamp = hmm_preprocessed.get_variable("annsamps")
-    states = [3, 5, 8, 11, 14, 16]
-
     expanded = np.concatenate([expand_annotation(samp, types, length) for
                                samp, types, length in zip(annsamp, anntype, lengths)])
     means, covariances = prepare_means_covars(hmm_features, expanded, states=states, num_states=states[5], num_features=3)
