@@ -1,7 +1,7 @@
 import os
 import cardio.batchflow as bf
 from cardio import EcgBatch
-from my_pipelines.my_pipelines import HMM_preprocessing_pipeline, HMM_train_pipeline
+from my_pipelines.my_pipelines import LoadEcgPipeline, HMM_preprocessing_pipeline, HMM_train_pipeline
 
 # Create dataset
 SIGNALS_PATH = "data\\qt-database-1.0.0"  # set path to QT database
@@ -17,7 +17,7 @@ all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
               "QRS_model_18": [3, 5, 11, 14, 17, 19]}
 
 # Preprocess data
-pipeline = HMM_preprocessing_pipeline()
+pipeline = LoadEcgPipeline() + HMM_preprocessing_pipeline()
 ppl_inits = (dtst.train >> pipeline).run()
 
 # Train and save models
