@@ -25,3 +25,42 @@ QRS_model_6 	sensitivity= 0.691863385233551	specificity= 0.6844040343816764
 QRS_model_16 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
 QRS_model_18 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
 Pan-Tompkins	sensitivity= 0.8516825715720744	specificity= 0.850870590596618
+
+********************************************************************************
+New models trained and tested on different dataset
+QRS test
+QRS_model_6 	sensitivity= 0.67776909552647	specificity= 0.6732971084804968
+QRS_model_9 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
+QRS_model_16 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
+QRS_model_18 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
+Pan-Tompkins	sensitivity= 0.8065051767923422	specificity= 0.806268919050874
+
+ST
+QRS_model_6 	sensitivity= 0.06690759914045712	specificity= 0.06643390553777519
+QRS_model_9 	sensitivity= 0.6226802109787067	specificity= 0.61863173216885
+QRS_model_16 	sensitivity= 0.8443055284235202	specificity= 0.8388975155279503
+QRS_model_18 	sensitivity= 0.8443055284235202	specificity= 0.8388975155279503
+
+T
+QRS_model_6 	sensitivity= 0.0016578896040569534	specificity= 0.0016498447204968945
+QRS_model_9 	sensitivity= 0.001462843768285547	specificity= 0.0014557453416149068
+QRS_model_16 	sensitivity= 0.17807684805929394	specificity= 0.17721273291925466
+QRS_model_18 	sensitivity= 0.7162083089526039	specificity= 0.7127329192546584
+
+ISO
+QRS_model_6 	sensitivity= 0.0	specificity= 0.0
+QRS_model_9 	sensitivity= 9.761811792268645e-05	specificity= 9.704968944099378e-05
+QRS_model_16 	sensitivity= 0.010933229207340883	specificity= 0.01086851043182921
+QRS_model_18 	sensitivity= 0.5432448262397501	specificity= 0.5400291120815138
+
+P
+QRS_model_6 	sensitivity= 0.000328893274132544	specificity= 0.00019409937888198756
+QRS_model_9 	sensitivity= 0.000493339911198816	specificity= 0.0002911490683229814
+QRS_model_16 	sensitivity= 0.030751521131392862	specificity= 0.01814653081028627
+QRS_model_18 	sensitivity= 0.9541193882585101	specificity= 0.5967294045047825
+
+PQ TEST
+QRS_model_6 	sensitivity= 0.000164446637066272	specificity= 9.704968944099378e-05
+QRS_model_9 	sensitivity= 0.000164446637066272	specificity= 9.704968944099378e-05
+QRS_model_16 	sensitivity= 0.49613550402894263	specificity= 0.3102951763858891
+QRS_model_18 	sensitivity= 0.9745107712547278	specificity= 0.5749490637430872

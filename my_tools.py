@@ -22,7 +22,7 @@ def calculate_sensitivity(batch, states, state_num, annot):
 def tp_fn_fp_count(true_annot, annot, states, state_num, error):
     true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
                                                                             state_num + 1)), np.int64))
-    intervals = find_intervals_borders(annot, np.array(list(range(states[state_num] if state_num != 0 else 0,
+    intervals = find_intervals_borders(annot, np.array(list(range(states[state_num - 1] if state_num != 0 else 0,
                                                                   states[state_num])), np.int64))
     tp = 0
     for i in range(len(true_intervals[0])):
