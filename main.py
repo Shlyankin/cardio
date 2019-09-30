@@ -40,12 +40,12 @@ all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
 type_states = {1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
-    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline(model_name + ".dill", annot="hmm_annotation" + model_name)
+    process_states_pipeline = process_states_pipeline + HMM_predict_pipeline("models\\2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
 process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
 batch = (dtst.test >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 
 for type_state in type_states:
-    print(type_states[type_state] + " TEST*************************")
+    print(type_states[type_state])
     for model_name in all_states.keys():
         states = all_states[model_name]
         parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), type_state, "hmm_annotation" + model_name)

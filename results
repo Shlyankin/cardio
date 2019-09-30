@@ -33,6 +33,7 @@ QRS_model_6 	sensitivity= 0.67776909552647	specificity= 0.6732971084804968
 QRS_model_9 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
 QRS_model_16 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
 QRS_model_18 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
+
 Pan-Tompkins	sensitivity= 0.8065051767923422	specificity= 0.806268919050874
 
 ST

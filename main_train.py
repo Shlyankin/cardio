@@ -11,11 +11,12 @@ dtst = bf.Dataset(index, batch_class=EcgBatch)
 dtst.split([0.9, 0.1])
 
 # Training models and they states
-all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
-              "QRS_model_9":  [3, 4,  5,  6,  7,  8],
-              "QRS_model_16": [3, 5,  8, 11, 14, 16],
-              "QRS_model_18": [3, 5, 11, 14, 17, 19],
-              "QRS_model_22": [3, 5, 13, 18, 21, 23]}
+all_states = {# "QRS_model_6":  [1, 2,  3,  4,  5,  6],
+              # "QRS_model_9":  [3, 4,  5,  6,  7,  8],
+              # "QRS_model_16": [3, 5,  8, 11, 14, 16],
+              # "QRS_model_18": [3, 5, 11, 14, 17, 19],
+                "QRS_model_22": [3, 5, 13, 18, 21, 23]
+    }
 
 # Preprocess data
 pipeline = LoadEcgPipeline() + HMM_preprocessing_pipeline()
