@@ -143,6 +143,14 @@ def HMM_predict_pipeline(model_path, batch_size=20, features="hmm_features",
                            save_to=bf.B(annot), mode='w')
             .calc_ecg_parameters(src=annot))
 
+def HilbertTransformPipeline(batch_size=20, annot = "hilbert_annotation"):
+    return (bf.Pipeline()
+            .init_variable(annot, init_on_each_run=list)
+            .load(fmt='wfdb', components=["signal", "meta"])
+            .band_pass_signals(8, 20)
+            .hilbert_transform(dst=annot)
+            .update_variable(annot, bf.B(annot), mode='e')
+            .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True))
 
 def PanTompkinsPipeline(batch_size=20, annot = "pan_tomp_annotation"):
     return (bf.Pipeline()

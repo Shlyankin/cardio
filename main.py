@@ -1,15 +1,8 @@
 import os
-import sys
 import numpy as np
-import tensorflow as tf
 import cardio.batchflow as bf
 from cardio import EcgBatch
-from cardio.models.metrics import classification_report
-from my_pipelines.my_pipelines import HMM_train_pipeline, HMM_preprocessing_pipeline, \
-    HMM_train_pipeline, PanTompkinsPipeline, HMM_predict_pipeline, LoadEcgPipeline
-from cardio.pipelines import hmm_preprocessing_pipeline, hmm_train_pipeline
-from my_tools import expand_annotation
-from cardio.pipelines import hmm_predict_pipeline
+from my_pipelines.my_pipelines import PanTompkinsPipeline, HMM_predict_pipeline, LoadEcgPipeline, HilbertTransformPipeline
 from my_tools import calculate_sensitivity
 import warnings
 
@@ -41,15 +34,16 @@ type_states = {1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
     process_states_pipeline = process_states_pipeline + HMM_predict_pipeline("models\\2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
-process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
+process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation") + HilbertTransformPipeline(annot="hilbert_annotation")
 batch = (dtst.test >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
-
+"""
 for type_state in type_states:
     print(type_states[type_state])
     for model_name in all_states.keys():
         states = all_states[model_name]
         parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), type_state, "hmm_annotation" + model_name)
         print(model_name + " \tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+"""
 
 """
     #show example Annotated ECG
@@ -61,8 +55,10 @@ for type_state in type_states:
         ]),
         'sel100', start=12, end=17, annot="hmm_annotation")
 """
-"""
-parameters = calculate_sensitivity(batch,  np.array(list(states), np.int64), 0, "pan_tomp_annotation")
+
+parameters = calculate_sensitivity(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
 print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
-"""
+parameters = calculate_sensitivity(batch,  np.array(list([1]), np.int64), 0, "hilbert_annotation")
+print("Hilbert-transform" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+
 

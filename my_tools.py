@@ -6,7 +6,8 @@ from cardio import EcgBatch
 def calculate_sensitivity(batch, states, state_num, annot):
     parameters = {"tp": 0, "fn": 0, "fp": 0}
     for i in range(len(batch.annotation)):
-        error = batch.meta[i]["fs"] / 10
+        # 100ms is max different between experts annotations and given annotation
+        error = batch.meta[i]["fs"] * 0.1
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
@@ -33,7 +34,6 @@ def tp_fn_fp_count(true_annot, annot, states, state_num, error):
     fn = len(true_intervals[0]) - tp
     fp = len(intervals[0]) - tp
     return {"tp": tp, "fn": fn, "fp": fp}
-
 
 def find_intervals_borders(hmm_annotation, inter_val):
     intervals = np.zeros(hmm_annotation.shape, dtype=np.int8)
