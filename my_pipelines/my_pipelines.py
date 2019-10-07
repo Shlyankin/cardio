@@ -2,6 +2,10 @@ import numpy as np
 import hmmlearn.hmm as hmm
 
 from functools import partial
+
+from cardio.batchflow import V, F
+from cardio.batchflow.batchflow.models import tf
+from cardio.models import DirichletModel, concatenate_ecg_batch
 from cardio.models.hmm import HMModel, prepare_hmm_input
 from cardio import batchflow as bf
 from my_tools import get_annsamples, expand_annotation, get_anntypes, prepare_means_covars, prepare_transmat_startprob
@@ -157,3 +161,54 @@ def PanTompkinsPipeline(batch_size=20, annot = "pan_tomp_annotation"):
             .init_variable(annot, init_on_each_run=list)
             .my_pan_tompkins(dst=annot)
             .update_variable(annot, bf.B(annot), mode='e'))
+
+def dirichlet_train_pipeline(labels_path, batch_size=256, n_epochs=1000, gpu_options=None,
+                             loss_history='loss_history', model_name='dirichlet'):
+    """Train pipeline for Dirichlet model.
+
+    This pipeline trains Dirichlet model to find propability of atrial fibrillation.
+    It works with dataset that generates batches of class ``EcgBatch``.
+
+    Parameters
+    ----------
+    labels_path : str
+        Path to csv file with true labels.
+    batch_size : int
+        Number of samples per gradient update.
+        Default value is 256.
+    n_epochs : int
+        Number of times to iterate over the training data arrays.
+        Default value is 1000.
+    gpu_options : GPUOptions
+        An argument for tf.ConfigProto ``gpu_options`` proto field.
+        Default value is ``None``.
+    loss_history : str
+        Name of pipeline variable to save loss values to.
+
+    Returns
+    -------
+    pipeline : Pipeline
+        Output pipeline.
+    """
+
+    model_config = {
+        "session": {"config": tf.ConfigProto(gpu_options=gpu_options)},
+        "input_shape": F(lambda batch: batch.signal[0].shape[1:]),
+        "class_names": F(lambda batch: batch.label_binarizer.classes_),
+        "loss": None,
+    }
+
+    return (bf.Pipeline()
+            .init_model("dynamic", DirichletModel, name=model_name, config=model_config)
+            .init_variable(loss_history, init_on_each_run=list)
+            .load(components=["signal", "meta"], fmt="wfdb")
+            .load(components="target", fmt="csv", src=labels_path)
+            .drop_labels(["~"])
+            .rename_labels({"N": "NO", "O": "NO"})
+            .flip_signals()
+            .random_resample_signals("normal", loc=300, scale=10)
+            .random_split_signals(2048, {"A": 9, "NO": 3})
+            .binarize_labels()
+            .train_model(model_name, make_data=concatenate_ecg_batch,
+                         fetches="loss", save_to=V(loss_history), mode="a")
+            .run(batch_size=batch_size, shuffle=True, drop_last=True, n_epochs=n_epochs, lazy=True))
