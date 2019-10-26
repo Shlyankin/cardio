@@ -6,7 +6,6 @@ from cardio import EcgBatch
 def calculate_accuracy(batch, states, state_num, annot):
     parameters = {"tp": 0, "fn": 0, "fp": 0, "tn" : 0}
     for i in range(len(batch.annotation)):
-        # 100ms is max different between experts annotations and given annotation
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
@@ -20,7 +19,7 @@ def calculate_accuracy(batch, states, state_num, annot):
     return {"accuracy" : (parameters["tp"] + parameters["tn"]) / (parameters["tp"] + parameters["tn"] + parameters["fp"] + parameters["fn"]),
             "precision" : precision,
             "recall" : recall,
-            "f-score" : 2 * precision * recall / (precision + recall) if (precision + recall) == 0 else 0}
+            "f-score" : 2 * precision * recall / (precision + recall) if (precision + recall) != 0 else 0}
 
 def tp_tn_fp_fn(true_annot, annot, states, state_num):
     def prepare_annot(hmm_annotation, inter_val):
@@ -43,48 +42,7 @@ def tp_tn_fp_fn(true_annot, annot, states, state_num):
             fn += 1
         if prepared_true_annot[i] == 0 and prepared_annot[i] == 1:
             fp += 1
-    return {"tp": tp, "fn": fn, "fp": fp, "tn" : tn}
-
-
-def calculate_accuracy2(batch, states, annot):
-    parameters = {"tp": 0, "fn": 0, "fp": 0, "tn" : 0}
-    for i in range(len(batch.annotation)):
-        # 100ms is max different between experts annotations and given annotation
-        anntype = batch.annotation[i]["anntype"]
-        annsamp = batch.annotation[i]["annsamp"]
-        expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
-        new_parameters = tp_tn_fp_fn2(expanded, batch.get(component=annot)[i], states)
-        parameters["tp"] += new_parameters["tp"]
-        parameters["fn"] += new_parameters["fn"]
-        parameters["fp"] += new_parameters["fp"]
-        parameters["tn"] += new_parameters["tn"]
-    precision = (parameters["tp"]) / (parameters["tp"] + parameters["fp"])
-    recall = (parameters["tp"]) / (parameters["tp"] + parameters["fn"])
-    return {"accuracy" : (parameters["tp"] + parameters["tn"]) / (parameters["tp"] + parameters["tn"] + parameters["fp"] + parameters["fn"]),
-            "precision" : precision,
-            "recall" : recall,
-            "f-score" : 2 * precision * recall / (precision + recall)}
-
-def tp_tn_fp_fn2(true_annot, annot, states):
-    def prepare_annot(hmm_annotation, inter_val, s_val):
-        intervals = np.zeros(hmm_annotation.shape, dtype=np.int8)
-        for val in inter_val:
-            intervals = np.logical_or(intervals, (hmm_annotation == val).astype(np.int8)).astype(np.int8)
-        return intervals
-    for i in range(6):
-        annot = prepare_annot(annot, np.array(list(range(states[i - 1] if i != 0 else 0,
-                                                                  states[i])), np.int64), i)
-    tp = 0; tn = 0; fn = 0; fp = 0;
-    for i in range(len(annot)):
-        if true_annot[i] == 1 and annot[i] == 1:
-            tp += 1
-        if true_annot[i] == 0 and annot[i] == 0:
-            tn += 1
-        if true_annot[i] == 1 and annot[i] == 0:
-            fn += 1
-        if true_annot[i] == 0 and annot[i] == 1:
-            fp += 1
-    return {"tp": tp, "fn": fn, "fp": fp, "tn" : tn}
+    return {"tp": tp, "fn": fn, "fp": fp, "tn": tn}
 
 def calculate_sensitivity(batch, states, state_num, annot):
     parameters = {"tp": 0, "fn": 0, "fp": 0}
