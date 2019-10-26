@@ -17,7 +17,7 @@ AF_SIGNALS_REF = os.path.join(AF_SIGNALS_PATH, "REFERENCE.csv")
 index = bf.FilesIndex(path=AF_SIGNALS_MASK, no_ext=True, sort=True)
 afds = bf.Dataset(index, batch_class=EcgBatch)
 
-pipeline = dirichlet_train_pipeline(AF_SIGNALS_REF, gpu_options=gpu_options)
+pipeline = dirichlet_train_pipeline(AF_SIGNALS_REF, n_epochs=250, gpu_options=gpu_options)
 train_ppl = (afds >> pipeline).run()
 model_path = "af_model_dump"
 train_ppl.save_model("dirichlet", path=model_path)
