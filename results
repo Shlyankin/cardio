@@ -33,8 +33,8 @@ QRS_model_6 	    sensitivity= 0.985  specificity= 0.684
 QRS_model_9 	    sensitivity= 0.969  specificity= 0.846
 QRS_model_16 	    sensitivity= 0.978	specificity= 0.972
 QRS_model_18 	    sensitivity= 0.985	specificity= 0.979
-Pan-Tompkins	    sensitivity= 0.806  specificity= 0.806
-Hilbert-transform	sensitivity= 0.638  specificity= 0.629
+Pan-Tompkins	    sensitivity= 0.810	specificity= 0.811
+Hilbert-transform	sensitivity= 0.638	specificity= 0.629
 
 ST
 QRS_model_6 	    sensitivity= 0.791  specificity= 0.549

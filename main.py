@@ -38,12 +38,12 @@ for model_name in all_states.keys():
     batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
     for type_state in type_states:
         print(type_states[type_state])
-        #"""
+        """
         states = all_states[model_name]
         parameters = calculate_old_metrics(batch,  np.array(list(states), np.int64), type_state, "hmm_annotation" + model_name)
         print(model_name + " \tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
         #"""
-        """
+        #"""
         states = all_states[model_name]
         parameters = calculate_metrics(batch, np.array(list(states), np.int64), type_state,
                                        "hmm_annotation" + model_name)
@@ -52,32 +52,39 @@ for model_name in all_states.keys():
               " \tprecision= " + str(parameters["precision"]) +
               " \trecall= " + str(parameters["recall"]) +
               " \tf-score= " + str(parameters["f-score"]))
-        """
+        #"""
 #"""
 process_states_pipeline_for_model = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
 batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
-parameters = calculate_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
 #"""
-print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
 """
+parameters = calculate_old_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
+print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+#"""
+#"""
+parameters = calculate_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
 print("Pan-Tompkins" +
               " \taccuracy= " + str(parameters["accuracy"]) +
               " \tprecision= " + str(parameters["precision"]) +
               " \trecall= " + str(parameters["recall"]) +
-              " \tf-score= " + str(parameters["f-score"]))"""
+              " \tf-score= " + str(parameters["f-score"]))
+#"""
 #"""
 process_states_pipeline_for_model = process_states_pipeline + HilbertTransformPipeline(annot="hilbert_annotation")
 batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
-print("Hilbert-transform" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
 #"""
 """
+parameters = calculate_old_metrics(batch,  np.array(list([1]), np.int64), 0, "hilbert_annotation")
+print("Hilbert-transform" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+#"""
+#"""
 parameters = calculate_metrics(batch,  np.array(list([1]), np.int64), 0, "hilbert_annotation")
 print("Hilbert-transform" +
               " \taccuracy= " + str(parameters["accuracy"]) +
               " \tprecision= " + str(parameters["precision"]) +
               " \trecall= " + str(parameters["recall"]) +
               " \tf-score= " + str(parameters["f-score"]))
-"""
+#"""
 #process_states_pipeline = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation") + HilbertTransformPipeline(annot="hilbert_annotation")
 #batch = (dtst.test >> process_states_pipeline).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 """
