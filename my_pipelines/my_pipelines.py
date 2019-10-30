@@ -153,8 +153,7 @@ def HilbertTransformPipeline(batch_size=20, annot = "hilbert_annotation"):
             .load(fmt='wfdb', components=["signal", "meta"])
             .band_pass_signals(8, 20)
             .hilbert_transform(dst=annot)
-            .update_variable(annot, bf.B(annot), mode='e')
-            .run(batch_size=batch_size, shuffle=False, drop_last=False, n_epochs=1, lazy=True))
+            .update_variable(annot, bf.B(annot), mode='e'))
 
 def PanTompkinsPipeline(batch_size=20, annot = "pan_tomp_annotation"):
     return (bf.Pipeline()

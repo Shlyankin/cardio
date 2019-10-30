@@ -24,7 +24,11 @@ def calculate_metrics(batch, states, state_num, annot):
     return {"accuracy": accuracy,
             "precision": precision,
             "recall": recall,
-            "f-score": fscore}
+            "f-score": fscore,
+            "tp": parameters["tp"],
+            "fn": parameters["fn"],
+            "fp": parameters["fp"],
+            "tn": parameters["tn"]}
 
 
 def tp_tn_fp_fn(true_annot, annot, states, state_num):
@@ -35,10 +39,10 @@ def tp_tn_fp_fn(true_annot, annot, states, state_num):
         return intervals
 
     # TODO: check range
-    prepared_true_annot = prepare_annot(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
-                                                                        state_num + 1)), np.int64))
-    prepared_annot = prepare_annot(annot, np.array(list(range(states[state_num - 1] if state_num != 0 else 0,
-                                                              states[state_num])), np.int64))
+    range1 = np.array(list(range(state_num, state_num + 1)), np.int64)
+    range2 = np.array(list(range(states[state_num - 1] if state_num != 0 else 0, states[state_num])), np.int64)
+    prepared_true_annot = prepare_annot(true_annot, range1)
+    prepared_annot = prepare_annot(annot, range2)
     tp = 0
     fp = 0
     tn = 0

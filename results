@@ -29,108 +29,81 @@ Pan-Tompkins	sensitivity= 0.8516825715720744	specificity= 0.850870590596618
 ********************************************************************************
 New models trained and tested on different dataset
 QRS test
-QRS_model_6 	sensitivity= 0.67776909552647	specificity= 0.6732971084804968
-QRS_model_9 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
-QRS_model_16 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
-QRS_model_18 	sensitivity= 0.9852510255909357	specificity= 0.9794154772307991
-
-Pan-Tompkins	sensitivity= 0.8065051767923422	specificity= 0.806268919050874
-Hilbert-transform	sensitivity= 0.6386012893143193	specificity= 0.6293800539083558
+QRS_model_6 	    sensitivity= 0.985  specificity= 0.684
+QRS_model_9 	    sensitivity= 0.969  specificity= 0.846
+QRS_model_16 	    sensitivity= 0.978	specificity= 0.972
+QRS_model_18 	    sensitivity= 0.985	specificity= 0.979
+Pan-Tompkins	    sensitivity= 0.806  specificity= 0.806
+Hilbert-transform	sensitivity= 0.638  specificity= 0.629
 
 ST
-QRS_model_6 	sensitivity= 0.06690759914045712	specificity= 0.06643390553777519
-QRS_model_9 	sensitivity= 0.6226802109787067	specificity= 0.61863173216885
-QRS_model_16 	sensitivity= 0.8443055284235202	specificity= 0.8388975155279503
-QRS_model_18 	sensitivity= 0.8443055284235202	specificity= 0.8388975155279503
+QRS_model_6 	    sensitivity= 0.791  specificity= 0.549
+QRS_model_9 	    sensitivity= 0.824  specificity= 0.719
+QRS_model_16 	    sensitivity= 0.893	specificity= 0.887
+QRS_model_18 	    sensitivity= 0.844	specificity= 0.838
 
 T
-QRS_model_6 	sensitivity= 0.0016578896040569534	specificity= 0.0016498447204968945
-QRS_model_9 	sensitivity= 0.001462843768285547	specificity= 0.0014557453416149068
-QRS_model_16 	sensitivity= 0.17807684805929394	specificity= 0.17721273291925466
-QRS_model_18 	sensitivity= 0.7162083089526039	specificity= 0.7127329192546584
+QRS_model_6 	    sensitivity= 0.588  specificity= 0.409
+QRS_model_9 	    sensitivity= 0.637  specificity= 0.557
+QRS_model_16 	    sensitivity= 0.718	specificity= 0.714
+QRS_model_18 	    sensitivity= 0.716	specificity= 0.712
 
 ISO
-QRS_model_6 	sensitivity= 0.0	specificity= 0.0
-QRS_model_9 	sensitivity= 9.761811792268645e-05	specificity= 9.704968944099378e-05
-QRS_model_16 	sensitivity= 0.010933229207340883	specificity= 0.01086851043182921
-QRS_model_18 	sensitivity= 0.5432448262397501	specificity= 0.5400291120815138
+QRS_model_6 	    sensitivity= 0.442  specificity= 0.307
+QRS_model_9 	    sensitivity= 0.490  specificity= 0.428
+QRS_model_16 	    sensitivity= 0.533	specificity= 0.530
+QRS_model_18 	    sensitivity= 0.543	specificity= 0.540
 
 P
-QRS_model_6 	sensitivity= 0.000328893274132544	specificity= 0.00019409937888198756
-QRS_model_9 	sensitivity= 0.000493339911198816	specificity= 0.0002911490683229814
-QRS_model_16 	sensitivity= 0.030751521131392862	specificity= 0.01814653081028627
-QRS_model_18 	sensitivity= 0.9541193882585101	specificity= 0.5967294045047825
+QRS_model_6 	    sensitivity= 0.930  specificity= 0.524
+QRS_model_9 	    sensitivity= 0.938  specificity= 0.559
+QRS_model_16 	    sensitivity= 0.956	specificity= 0.585
+QRS_model_18 	    sensitivity= 0.954	specificity= 0.596
 
 PQ TEST
-QRS_model_6 	sensitivity= 0.000164446637066272	specificity= 9.704968944099378e-05
-QRS_model_9 	sensitivity= 0.000164446637066272	specificity= 9.704968944099378e-05
-QRS_model_16 	sensitivity= 0.49613550402894263	specificity= 0.3102951763858891
-QRS_model_18 	sensitivity= 0.9745107712547278	specificity= 0.5749490637430872
+QRS_model_6 	    sensitivity= 0.977  specificity= 0.402
+QRS_model_9 	    sensitivity= 0.984  specificity= 0.510
+QRS_model_16 	    sensitivity= 0.970	specificity= 0.572
+QRS_model_18 	    sensitivity= 0.974	specificity= 0.574
 
 ---------------------------------------------------------------------------------------------------
-accuracy
-ST
-QRS_model_6 	accuracy= 0.855306538050256
-T
-QRS_model_6 	accuracy= 0.8372265219791306
-ISO
-QRS_model_6 	accuracy= 0.8119184994831107
-P
-QRS_model_6 	accuracy= 0.8907323473176421
-PQ
-QRS_model_6 	accuracy= 0.9380052782269139
-
-ST
-QRS_model_6 	accuracy= 0.8235585098297865
-QRS_model_9 	accuracy= 0.8877407891029236
-QRS_model_16 	accuracy= 0.9051412490144436
-QRS_model_18 	accuracy= 0.9051412490144436
-T
-QRS_model_6 	accuracy= 0.6847139419679484
-QRS_model_9 	accuracy= 0.7151641912570589
-QRS_model_16 	accuracy= 0.7696877952780402
-QRS_model_18 	accuracy= 0.8590616524992467
-ISO
-QRS_model_6 	accuracy= 0.5883716341081192
-QRS_model_9 	accuracy= 0.554365381658117
-QRS_model_16 	accuracy= 0.5233257985118209
-QRS_model_18 	accuracy= 0.8369265217124637
-P
-QRS_model_6 	accuracy= 0.9069608061873833
-QRS_model_9 	accuracy= 0.8996176885490564
-QRS_model_16 	accuracy= 0.6762197121952997
-QRS_model_18 	accuracy= 0.9084208074851622
-PQ
-QRS_model_6 	accuracy= 0.8945203506847562
-QRS_model_9 	accuracy= 0.9171594819195394
-QRS_model_16 	accuracy= 0.8848776754468226
-QRS_model_18 	accuracy= 0.9459946186618833
-
-ST
-QRS_model_6 	accuracy= 0.8235585098297865 	precision= 0.04844978127886509 	recall= 0.01895314550629783 	f-score= 0.027247355511831283
-QRS_model_9 	accuracy= 0.8877407891029236 	precision= 0.7799198110616796 	recall= 0.19362206200678359 	f-score= 0.3102273999612216
-QRS_model_16 	accuracy= 0.9051412490144436 	precision= 0.7673922207575828 	recall= 0.39094612329771095 	f-score= 0.5179989340656362
-QRS_model_18 	accuracy= 0.9051412490144436 	precision= 0.7673922207575828 	recall= 0.39094612329771095 	f-score= 0.5179989340656362
-T
-QRS_model_6 	accuracy= 0.6847139419679484 	precision= 0.023476142799503878 	recall= 0.0054001192769821205 	f-score= 0.008780497347266993
-QRS_model_9 	accuracy= 0.7151641912570589 	precision= 0.11472050743268816 	recall= 0.015107271942925792 	f-score= 0.026698660510889042
-QRS_model_16 	accuracy= 0.7696877952780402 	precision= 0.5930754672275249 	recall= 0.34845893795362637 	f-score= 0.4389907502035302
-QRS_model_18 	accuracy= 0.8590616524992467 	precision= 0.6732105001439451 	recall= 0.8841861752134181 	f-score= 0.7644082290071685
-ISO
-QRS_model_6 	accuracy= 0.5883716341081192 	precision= 0.0018262206843521723 	recall= 0.00015581050162780973 	f-score= 0.000287123999788435
-QRS_model_9 	accuracy= 0.554365381658117 	precision= 0.0025161850096776348 	recall= 0.00044165833920063356 	f-score= 0.0007514218715586822
-QRS_model_16 	accuracy= 0.5233257985118209 	precision= 0.24082041470627932 	recall= 0.11914700193650195 	f-score= 0.15942015355146544
-QRS_model_18 	accuracy= 0.8369265217124637 	precision= 0.8862979731274289 	recall= 0.6540655411603313 	f-score= 0.7526755315169087
-P
-QRS_model_6 	accuracy= 0.9069608061873833 	precision= 0.00031323005442372194 	recall= 0.00018077053440289232 	f-score= 0.0002292416876008902
-QRS_model_9 	accuracy= 0.8996176885490564 	precision= 0.00013960331182010503 	recall= 9.791737280156668e-05 	f-score= 0.00011510230824398148
-QRS_model_16 	accuracy= 0.6762197121952997 	precision= 0.027142439866907113 	recall= 0.12878394155086054 	f-score= 0.044835394210837536
-QRS_model_18 	accuracy= 0.9084208074851622 	precision= 0.36961008276578633 	recall= 0.7823824050013182 	f-score= 0.502045679182405
-
 QRS
-QRS_model_6 	accuracy= 0.8826407845695863 	precision= 0.7811633388796451 	recall= 0.15200572002886995
-QRS_model_9 	accuracy= 0.9543092927193713 	precision= 0.8161982683191203 	recall= 0.8431477696609129
-QRS_model_16 	accuracy= 0.9543092927193713 	precision= 0.8161982683191203 	recall= 0.8431477696609129
-QRS_model_18 	accuracy= 0.9543092927193713 	precision= 0.8161982683191203 	recall= 0.8431477696609129
-Pan-Tompkins 	accuracy= 0.931603494758662 	precision= 0.8774069251696359 	recall= 0.5590923501359182
-Hilbert-transform 	accuracy= 0.8386185232164651 	precision= 0.21475923737088237 	recall= 0.08456604002671146
+QRS_model_6 	accuracy= 0.919 	precision= 0.635	recall= 0.916	f-score= 0.750
+QRS_model_9 	accuracy= 0.903 	precision= 0.582	recall= 0.950	f-score= 0.722
+QRS_model_16 	accuracy= 0.942 	precision= 0.749	recall= 0.846	f-score= 0.795
+QRS_model_18 	accuracy= 0.954 	precision= 0.816	recall= 0.843	f-score= 0.829
+Pan-Tompkins 	accuracy= 0.931	    precision= 0.877	recall= 0.559	f-score= 0.682
+ST
+QRS_model_6 	accuracy= 0.855	    precision= 0.444 	recall= 0.442	f-score= 0.443
+QRS_model_9 	accuracy= 0.867 	precision= 0.491	recall= 0.414   f-score= 0.449
+QRS_model_16 	accuracy= 0.912 	precision= 0.691	recall= 0.597	f-score= 0.640
+QRS_model_18 	accuracy= 0.905 	precision= 0.767	recall= 0.390   f-score= 0.517
+T
+QRS_model_6 	accuracy= 0.837 	precision= 0.736	recall= 0.577	f-score= 0.647
+QRS_model_9 	accuracy= 0.847 	precision= 0.741	recall= 0.630	f-score= 0.681
+QRS_model_16 	accuracy= 0.862 	precision= 0.749	recall= 0.706	f-score= 0.727
+QRS_model_18 	accuracy= 0.859 	precision= 0.673	recall= 0.884	f-score= 0.764
+ISO
+QRS_model_6 	accuracy= 0.811 	precision= 0.832	recall= 0.630	f-score= 0.717
+QRS_model_9 	accuracy= 0.799 	precision= 0.846	recall= 0.575	f-score= 0.685
+QRS_model_16 	accuracy= 0.831 	precision= 0.819	recall= 0.713	f-score= 0.762
+QRS_model_18 	accuracy= 0.836 	precision= 0.886	recall= 0.654	f-score= 0.752
+P
+QRS_model_6 	accuracy= 0.890 	precision= 0.304	recall= 0.665	f-score= 0.418
+QRS_model_9 	accuracy= 0.905 	precision= 0.361	recall= 0.780	f-score= 0.494
+QRS_model_16 	accuracy= 0.918 	precision= 0.401 	recall= 0.767	f-score= 0.526
+QRS_model_18 	accuracy= 0.908 	precision= 0.369 	recall= 0.782	f-score= 0.502
+PQ
+QRS_model_6 	accuracy= 0.938 	precision= 0.312 	recall= 0.493   f-score= 0.382
+QRS_model_9 	accuracy= 0.945 	precision= 0.385 	recall= 0.687	f-score= 0.494
+QRS_model_16 	accuracy= 0.946 	precision= 0.358 	recall= 0.473	f-score= 0.407
+QRS_model_18 	accuracy= 0.945 	precision= 0.357 	recall= 0.486   f-score= 0.411
+
+
+all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
+              "QRS_model_9":  [3, 4,  5,  6,  7,  8],
+              "QRS_model_16": [3, 5,  8, 11, 14, 16],
+              "QRS_model_18": [3, 5, 11, 14, 17, 19]
+              }
+type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
+
