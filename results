@@ -100,6 +100,11 @@ QRS_model_16 	accuracy= 0.946 	precision= 0.358 	recall= 0.473	f-score= 0.407
 QRS_model_18 	accuracy= 0.945 	precision= 0.357 	recall= 0.486   f-score= 0.411
 
 
+QRS_model_6	    accuracy= 0.8754932967347823	precision= 0.6254938893279016	recall= 0.6267298015952361	f-score= 0.6261112355549109
+QRS_model_9	    accuracy= 0.8782464843672454	precision= 0.6337534522252909	recall= 0.6350056845483155	f-score= 0.6343789504264097
+QRS_model_16	accuracy= 0.9025265059494868	precision= 0.7065935169720151	recall= 0.7079896738498753	f-score= 0.7072909064256525
+QRS_model_18	accuracy= 0.9016423570154285	precision= 0.7039410701698402	recall= 0.705331986082765	f-score= 0.704635841727358
+
 all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
               "QRS_model_9":  [3, 4,  5,  6,  7,  8],
               "QRS_model_16": [3, 5,  8, 11, 14, 16],

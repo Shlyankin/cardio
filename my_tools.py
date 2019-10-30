@@ -89,7 +89,10 @@ def calculate_old_metrics(batch, states, state_num, annot):
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
     return {"sensitivity": float(parameters["tp"]) / (parameters["tp"] + parameters["fn"]),
-            "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"])}
+            "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"]),
+            "tp": parameters["tp"],
+            "fn": parameters["fn"],
+            "fp": parameters["fp"]}
 
 
 def find_intervals_borders(hmm_annotation, inter_val):

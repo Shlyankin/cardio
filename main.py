@@ -7,6 +7,47 @@ from my_tools import calculate_old_metrics, calculate_metrics
 import warnings
 
 warnings.filterwarnings('ignore')
+
+def print_old_metrics(batch, model_name, states, type_states):
+    parameters = {"tp": 0, "fn": 0, "fp": 0}
+    for type_state in type_states:
+        print(type_states[type_state])
+        states = all_states[model_name]
+        state_parameters = calculate_old_metrics(batch, np.array(list(states), np.int64), type_state,
+                                           "hmm_annotation" + model_name)
+        print(model_name + " \tsensitivity= " + str(state_parameters["sensitivity"]) + "\tspecificity= " + str(
+            state_parameters["specificity"]))
+        parameters["tp"] += state_parameters["tp"]
+        parameters["fn"] += state_parameters["fn"]
+        parameters["fp"] += state_parameters["fp"]
+    sensitivity = float(parameters["tp"]) / (parameters["tp"] + parameters["fn"])
+    specificity = float(parameters["tp"]) / (parameters["tp"] + parameters["fp"])
+    print(model_name + " \tsensitivity= " + str(sensitivity) + "\tspecificity= " + str(specificity))
+
+def print_metrics(batch, model_name, states, type_states):
+    parameters = {"tp": 0, "fn": 0, "fp": 0, "tn": 0}
+    for type_state in type_states:
+        print(type_states[type_state], end='\t')
+        states = all_states[model_name]
+        state_parameters = calculate_metrics(batch, np.array(list(states), np.int64), type_state, "hmm_annotation" + model_name)
+        for i in parameters.keys():
+            parameters[i] += state_parameters[i]
+        print(model_name +
+              "\taccuracy= " + str(state_parameters["accuracy"]) +
+              "\tprecision= " + str(state_parameters["precision"]) +
+              "\trecall= " + str(state_parameters["recall"]) +
+              "\tf-score= " + str(state_parameters["f-score"]))
+    accuracy = (parameters["tp"] + parameters["tn"]) / (
+            parameters["tp"] + parameters["tn"] + parameters["fp"] + parameters["fn"])
+    precision = (parameters["tp"]) / (parameters["tp"] + parameters["fp"])
+    recall = (parameters["tp"]) / (parameters["tp"] + parameters["fn"])
+    fscore = 2 * precision * recall / (precision + recall)
+    print(model_name +
+          "\taccuracy= "  + str(accuracy)   +
+          "\tprecision= " + str(precision)  +
+          "\trecall= "    + str(recall)     +
+          "\tf-score= "   + str(fscore))
+
 """
 sys.path.append("..")
 index = bf.FilesIndex(path="data/A*.hea", no_ext=True, sort=True)
@@ -36,14 +77,15 @@ process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
     process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline("models\\2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
     batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
-    for type_state in type_states:
-        print(type_states[type_state])
-        """
+    print_metrics(batch, model_name, all_states[model_name], type_states)
+    #for type_state in type_states:
+    #    print(type_states[type_state])
+    """
         states = all_states[model_name]
         parameters = calculate_old_metrics(batch,  np.array(list(states), np.int64), type_state, "hmm_annotation" + model_name)
         print(model_name + " \tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
-        #"""
-        #"""
+    #"""
+    """
         states = all_states[model_name]
         parameters = calculate_metrics(batch, np.array(list(states), np.int64), type_state,
                                        "hmm_annotation" + model_name)
@@ -52,8 +94,8 @@ for model_name in all_states.keys():
               " \tprecision= " + str(parameters["precision"]) +
               " \trecall= " + str(parameters["recall"]) +
               " \tf-score= " + str(parameters["f-score"]))
-        #"""
-#"""
+    #"""
+"""
 process_states_pipeline_for_model = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
 batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 #"""
@@ -61,7 +103,7 @@ batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuf
 parameters = calculate_old_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
 print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
 #"""
-#"""
+"""
 parameters = calculate_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
 print("Pan-Tompkins" +
               " \taccuracy= " + str(parameters["accuracy"]) +
@@ -69,7 +111,7 @@ print("Pan-Tompkins" +
               " \trecall= " + str(parameters["recall"]) +
               " \tf-score= " + str(parameters["f-score"]))
 #"""
-#"""
+"""
 process_states_pipeline_for_model = process_states_pipeline + HilbertTransformPipeline(annot="hilbert_annotation")
 batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
 #"""
@@ -77,7 +119,7 @@ batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuf
 parameters = calculate_old_metrics(batch,  np.array(list([1]), np.int64), 0, "hilbert_annotation")
 print("Hilbert-transform" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
 #"""
-#"""
+"""
 parameters = calculate_metrics(batch,  np.array(list([1]), np.int64), 0, "hilbert_annotation")
 print("Hilbert-transform" +
               " \taccuracy= " + str(parameters["accuracy"]) +
