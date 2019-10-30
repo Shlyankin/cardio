@@ -3,7 +3,7 @@ import numpy as np
 import cardio.batchflow as bf
 from cardio import EcgBatch
 from my_pipelines.my_pipelines import PanTompkinsPipeline, HMM_predict_pipeline, LoadEcgPipeline, HilbertTransformPipeline
-from my_tools import calculate_sensitivity, calculate_accuracy, calculate_accuracy2
+from my_tools import calculate_old_metrics, calculate_metrics
 import warnings
 
 warnings.filterwarnings('ignore')

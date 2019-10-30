@@ -3,23 +3,29 @@ import matplotlib.pyplot as plt
 from cardio import EcgBatch
 
 
-def calculate_accuracy(batch, states, state_num, annot):
-    parameters = {"tp": 0, "fn": 0, "fp": 0, "tn" : 0}
+def calculate_metrics(batch, states, state_num, annot):
+    parameters = {"tp": 0, "fn": 0, "fp": 0, "tn": 0}
     for i in range(len(batch.annotation)):
+        # prepare annotations
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
+        # calculate parameters for each record and sum them
         new_parameters = tp_tn_fp_fn(expanded, batch.get(component=annot)[i], states, state_num)
         parameters["tp"] += new_parameters["tp"]
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
         parameters["tn"] += new_parameters["tn"]
+    accuracy = (parameters["tp"] + parameters["tn"]) / (
+                parameters["tp"] + parameters["tn"] + parameters["fp"] + parameters["fn"])
     precision = (parameters["tp"]) / (parameters["tp"] + parameters["fp"])
     recall = (parameters["tp"]) / (parameters["tp"] + parameters["fn"])
-    return {"accuracy" : (parameters["tp"] + parameters["tn"]) / (parameters["tp"] + parameters["tn"] + parameters["fp"] + parameters["fn"]),
-            "precision" : precision,
-            "recall" : recall,
-            "f-score" : 2 * precision * recall / (precision + recall) if (precision + recall) != 0 else 0}
+    fscore = 2 * precision * recall / (precision + recall)
+    return {"accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f-score": fscore}
+
 
 def tp_tn_fp_fn(true_annot, annot, states, state_num):
     def prepare_annot(hmm_annotation, inter_val):
@@ -28,11 +34,15 @@ def tp_tn_fp_fn(true_annot, annot, states, state_num):
             intervals = np.logical_or(intervals, (hmm_annotation == val).astype(np.int8)).astype(np.int8)
         return intervals
 
+    # TODO: check range
     prepared_true_annot = prepare_annot(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
-                                                                            state_num + 1)), np.int64))
+                                                                        state_num + 1)), np.int64))
     prepared_annot = prepare_annot(annot, np.array(list(range(states[state_num - 1] if state_num != 0 else 0,
-                                                                  states[state_num])), np.int64))
-    tp = 0; tn = 0; fn = 0; fp = 0;
+                                                              states[state_num])), np.int64))
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
     for i in range(len(prepared_annot)):
         if prepared_true_annot[i] == 1 and prepared_annot[i] == 1:
             tp += 1
@@ -44,7 +54,25 @@ def tp_tn_fp_fn(true_annot, annot, states, state_num):
             fp += 1
     return {"tp": tp, "fn": fn, "fp": fp, "tn": tn}
 
-def calculate_sensitivity(batch, states, state_num, annot):
+
+def calculate_old_metrics(batch, states, state_num, annot):
+    def tp_fn_fp(true_annot, annot, states, state_num, error):
+        true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
+                                                                                state_num + 1)), np.int64))
+        intervals = find_intervals_borders(annot, np.array(list(range(states[state_num - 1] if state_num != 0 else 0,
+                                                                      states[state_num])), np.int64))
+        tp = 0
+        for i in range(len(true_intervals[0])):
+            for j in range(len(intervals[0])):
+                if abs(true_intervals[0][i] - intervals[0][j]) < error and abs(
+                        true_intervals[1][i] - intervals[1][j]) < error:
+                    tp += 1
+                    break
+        fn = len(true_intervals[0]) - tp
+        fp = len(intervals[0]) - tp
+        return {"tp": tp, "fn": fn, "fp": fp}
+
+    # ------------ body of function ------------
     parameters = {"tp": 0, "fn": 0, "fp": 0}
     for i in range(len(batch.annotation)):
         # 100ms is max different between experts annotations and given annotation
@@ -52,29 +80,13 @@ def calculate_sensitivity(batch, states, state_num, annot):
         anntype = batch.annotation[i]["anntype"]
         annsamp = batch.annotation[i]["annsamp"]
         expanded = expand_annotation(annsamp, anntype, len(batch.signal[0][0]))
-        new_parameters = tp_fn_fp_count(expanded, batch.get(component=annot)[i], states, state_num, error=error)
+        new_parameters = tp_fn_fp(expanded, batch.get(component=annot)[i], states, state_num, error=error)
         parameters["tp"] += new_parameters["tp"]
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
     return {"sensitivity": float(parameters["tp"]) / (parameters["tp"] + parameters["fn"]),
             "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"])}
 
-
-
-def tp_fn_fp_count(true_annot, annot, states, state_num, error):
-    true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
-                                                                            state_num + 1)), np.int64))
-    intervals = find_intervals_borders(annot, np.array(list(range(states[state_num - 1] if state_num != 0 else 0,
-                                                                  states[state_num])), np.int64))
-    tp = 0
-    for i in range(len(true_intervals[0])):
-        for j in range(len(intervals[0])):
-            if abs(true_intervals[0][i] - intervals[0][j]) < error and abs(true_intervals[1][i] - intervals[1][j]) < error:
-                tp += 1
-                break
-    fn = len(true_intervals[0]) - tp
-    fp = len(intervals[0]) - tp
-    return {"tp": tp, "fn": fn, "fp": fp}
 
 def find_intervals_borders(hmm_annotation, inter_val):
     intervals = np.zeros(hmm_annotation.shape, dtype=np.int8)
@@ -109,13 +121,15 @@ def prepare_means_covars(hmm_features, clustering, states=(3, 5, 11, 14, 17, 19)
 
 
 def prepare_transmat_startprob(states=(3, 5, 11, 14, 17, 19)):
-    """ This function is specific to the task and the model configuration, thus contains hardcode.
+    """
+        Function calculate transition matrix (матрицу переходов) and start probabilities (вектор начальных вероятностей)
     """
     # Transition matrix - each row should add up tp 1
     transition_matrix = np.diag(states[5] * [14 / 15.0]) + np.diagflat((states[5] - 1) * [1 / 15.0], 1) + np.diagflat(
         [1 / 15.0], -(states[5] - 1))
 
     # We suppose that absence of P-peaks is possible
+    # P-peaks may not appear
     transition_matrix[states[3] - 1, states[3]] = 0.9 * 1 / 15.0
     transition_matrix[states[3] - 1, states[4]] = 0.1 * 1 / 15.0
 
@@ -126,7 +140,8 @@ def prepare_transmat_startprob(states=(3, 5, 11, 14, 17, 19)):
 
 
 def expand_annotation(annsamp, anntype, length):
-    """Unravel annotation
+    """
+        Unravel annotation
     """
     begin = -1
     end = -1
