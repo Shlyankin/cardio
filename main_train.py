@@ -16,11 +16,11 @@ dtst.split([0.9, 0.1])
 all_states = {
     # "QRS_model_6":     [1, 2, 3, 4, 5, 6],
     # "QRS_model_9":     [3, 4, 5, 6, 7, 8],
-    "QRS_model_12": [3, 4, 6, 8, 10, 11],
+    # "QRS_model_12": [3, 4, 6, 8, 10, 11],
     # "QRS_model_16":    [3, 5, 8, 11, 14, 16],
     # "QRS_model_18":    [3, 5, 11, 14, 17, 19],
-    "QRS_model_9_ST": [1, 4, 5, 6, 7, 8],
-    "QRS_model_9_T": [1, 2, 5, 6, 7, 8],
+    # "QRS_model_9_ST": [1, 4, 5, 6, 7, 8],
+    # "QRS_model_9_T": [1, 2, 5, 6, 7, 8],
     "QRS_model_9_ISO": [1, 2, 3, 6, 7, 8],
     "QRS_model_9_P": [1, 2, 3, 4, 7, 8],
     "QRS_model_9_PQ": [1, 2, 3, 4, 5, 8],
@@ -47,4 +47,8 @@ for model_name in all_states.keys():
     ppl_train = (dtst.train >> pipeline).run(batch_size=95, shuffle=False, drop_last=False, n_epochs=1)
     ppl_train.save_model("HMM", path=model_name + ".dill")
     end_time = time.time()
-    print(model_name + " is trained for " + str(end_time - st_time) + " s")
+    f = open("result_time.txt", "a")
+    f.write(model_name + " is trained for " + str((end_time - st_time)/60) + " min")
+    f.close()
+    print(model_name + " is trained for " + str((end_time - st_time)/60) + " min")
+#os.system('shutdown -s')

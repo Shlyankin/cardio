@@ -1,0 +1,6 @@
+QRS_model_6 is trained for 29.8 minutes
+QRS_model_9 is trained for 45.6 minutes
+QRS_model_16 is trained for 152.1 minutes
+QRS_model_12 is trained for 4509.244914054871 s
+QRS_model_9_ST is trained for 2748.246190547943 s
+QRS_model_9_T is trained for 2754.3985426425934 s
