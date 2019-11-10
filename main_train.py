@@ -21,12 +21,12 @@ all_states = {
     # "QRS_model_18":    [3, 5, 11, 14, 17, 19],
     # "QRS_model_9_ST": [1, 4, 5, 6, 7, 8],
     # "QRS_model_9_T": [1, 2, 5, 6, 7, 8],
-    "QRS_model_9_ISO": [1, 2, 3, 6, 7, 8],
-    "QRS_model_9_P": [1, 2, 3, 4, 7, 8],
-    "QRS_model_9_PQ": [1, 2, 3, 4, 5, 8],
+    # "QRS_model_9_ISO": [1, 2, 3, 6, 7, 8],
+    # "QRS_model_9_P": [1, 2, 3, 4, 7, 8],
+    # "QRS_model_9_PQ": [1, 2, 3, 4, 5, 8],
 
-    "QRS_model_11_ST": [3, 6, 7, 8, 9, 10],
-    "QRS_model_11_T": [3, 4, 7, 8, 9, 10],
+    # "QRS_model_11_ST": [3, 6, 7, 8, 9, 10],
+    # "QRS_model_11_T": [3, 4, 7, 8, 9, 10],
     "QRS_model_11_ISO": [3, 4, 5, 8, 9, 10],
     "QRS_model_11_P": [3, 4, 5, 6, 9, 10],
     "QRS_model_11_PQ": [3, 4, 5, 6, 7, 10],
@@ -48,7 +48,7 @@ for model_name in all_states.keys():
     ppl_train.save_model("HMM", path=model_name + ".dill")
     end_time = time.time()
     f = open("result_time.txt", "a")
-    f.write(model_name + " is trained for " + str((end_time - st_time)/60) + " min")
+    f.write(model_name + " is trained for " + str((end_time - st_time)/60) + " min\n")
     f.close()
     print(model_name + " is trained for " + str((end_time - st_time)/60) + " min")
 #os.system('shutdown -s')
