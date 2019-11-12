@@ -67,15 +67,32 @@ dtst.split([0.9, 0.1])
 
 #[3, 5, 8, 11, 14, 16]
 #[3, 5, 11, 14, 17, 19]
-all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
-              "QRS_model_9":  [3, 4,  5,  6,  7,  8],
-              "QRS_model_16": [3, 5,  8, 11, 14, 16],
-              "QRS_model_18": [3, 5, 11, 14, 17, 19]
+all_states = {
+        "QRS_model_6":     [1, 2, 3, 4, 5, 6],
+        "QRS_model_9":     [3, 4, 5, 6, 7, 8],
+        "QRS_model_12": [3, 4, 6, 8, 10, 11],
+        "QRS_model_16":    [3, 5, 8, 11, 14, 16],
+        "QRS_model_18":    [3, 5, 11, 14, 17, 19],
+        "QRS_model_9_ST": [1, 4, 5, 6, 7, 8],
+        "QRS_model_9_T": [1, 2, 5, 6, 7, 8],
+        "QRS_model_9_ISO": [1, 2, 3, 6, 7, 8],
+        "QRS_model_9_P": [1, 2, 3, 4, 7, 8],
+        "QRS_model_9_PQ": [1, 2, 3, 4, 5, 8],
+
+        "QRS_model_11_ST": [3, 6, 7, 8, 9, 10],
+        "QRS_model_11_T": [3, 4, 7, 8, 9, 10],
+        "QRS_model_11_ISO": [3, 4, 5, 8, 9, 10],
+        "QRS_model_11_P": [3, 4, 5, 6, 9, 10],
+        "QRS_model_11_PQ": [3, 4, 5, 6, 7, 10],
+
+        "QRS_model_18_ES": [3, 6, 9, 12, 15, 18],
+
+        # "QRS_model_22": [3, 5, 13, 18, 21, 23],
               }
 type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 process_states_pipeline = LoadEcgPipeline(batch_size=20, annot_ext="pu1")
 for model_name in all_states.keys():
-    process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline("models\\2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
+    process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline("models\\3.2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
     batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
     print_metrics(batch, model_name, all_states[model_name], type_states)
     #for type_state in type_states:
