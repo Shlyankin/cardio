@@ -51,4 +51,4 @@ for model_name in all_states.keys():
     f.write(model_name + " is trained for " + str((end_time - st_time)/60) + " min\n")
     f.close()
     print(model_name + " is trained for " + str((end_time - st_time)/60) + " min")
-#os.system('shutdown -s')
+os.system('shutdown -s')
