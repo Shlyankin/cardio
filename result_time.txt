@@ -1,7 +1,7 @@
-QRS_model_6 is trained for 29.8 minutes
-QRS_model_9 is trained for 45.6 minutes
-QRS_model_16 is trained for 152.1 minutes
-QRS_model_12 is trained for 75 min
+QRS_model_6 is trained for      29.8 minutes
+QRS_model_9 is trained for      45.6 minutes
+QRS_model_16 is trained for     152.1 minutes
+QRS_model_12 is trained for     75 min
 QRS_model_9_ST is trained for 46 min
 QRS_model_9_T is trained for 46 min
 QRS_model_9_ISO is trained for 209.24375991423923 min
@@ -12,4 +12,6 @@ QRS_model_11_T is trained for 61.082843736807504 min
 QRS_model_11_ISO is trained for 60.879865463574724 min
 QRS_model_11_P is trained for 62.70915227333705 min
 QRS_model_11_PQ is trained for 61.243302913506824 min
-QRS_model_18_ES is trained for 191.35620562632877 minQRS_model_22 is trained for 491.8248597343763 min
+QRS_model_18_ES is trained for 191.35620562632877 min
+QRS_model_22 is trained for 491.8248597343763 min
+QRS_model_22 is trained for 4415.600282029311 min

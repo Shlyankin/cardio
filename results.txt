@@ -120,94 +120,131 @@ all_states = {"QRS_model_6":  [1, 2,  3,  4,  5,  6],
 type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 
 ****
-QRS	QRS_model_6	accuracy= 0.9197705953516403	precision= 0.6356390070026242	recall= 0.916587409191169	f-score= 0.750687792104478
-ST	QRS_model_6	accuracy= 0.855306538050256	precision= 0.44481495316853503	recall= 0.4424434558810997	f-score= 0.44362603521172495
-T	QRS_model_6	accuracy= 0.8372265219791306	precision= 0.7363293367620977	recall= 0.5772559075620576	f-score= 0.6471608316152527
-ISO	QRS_model_6	accuracy= 0.8119184994831107	precision= 0.8329718037900261	recall= 0.6307080240065324	f-score= 0.7178646455932248
-P	QRS_model_6	accuracy= 0.8907323473176421	precision= 0.3049639029639927	recall= 0.665936052423455	f-score= 0.4183468266623766
-PQ	QRS_model_6	accuracy= 0.9380052782269139	precision= 0.31200324001417507	recall= 0.49304563480725494	f-score= 0.3821676927846924
-QRS_model_6	accuracy= 0.8754932967347823	precision= 0.6254938893279016	recall= 0.6267298015952361	f-score= 0.6261112355549109
-QRS	QRS_model_9	accuracy= 0.9035981365316769	precision= 0.5822143907719257	recall= 0.9505601985821344	f-score= 0.7221281338474743
-ST	QRS_model_9	accuracy= 0.8676443267949572	precision= 0.4910328466122518	recall= 0.41486253856249256	f-score= 0.449745382517498
-T	QRS_model_9	accuracy= 0.8475078644514351	precision= 0.7410431214484478	recall= 0.630705401322359	f-score= 0.6814367087726139
-ISO	QRS_model_9	accuracy= 0.7996602663646812	precision= 0.8469914948378128	recall= 0.5759763636640538	f-score= 0.6856754751504806
-P	QRS_model_9	accuracy= 0.9058185829498515	precision= 0.361819292885203	recall= 0.7804466538620871	f-score= 0.49442191153313936
-PQ	QRS_model_9	accuracy= 0.9452497291108704	precision= 0.38561877840381004	recall= 0.6875507148653127	f-score= 0.4941110764328072
-QRS_model_9	accuracy= 0.8782464843672454	precision= 0.6337534522252909	recall= 0.6350056845483155	f-score= 0.6343789504264097
-QRS	QRS_model_12	accuracy= 0.9345408307029607	precision= 0.7013257202684361	recall= 0.8765708157111926	f-score= 0.7792166909261528
-ST	QRS_model_12	accuracy= 0.8915785702920624	precision= 0.7480046983706291	recall= 0.2539857851408703	f-score= 0.3792103093413137
-T	QRS_model_12	accuracy= 0.8344376306112272	precision= 0.6612650730501721	recall= 0.7376009514659554	f-score= 0.6973501943786585
-ISO	QRS_model_12	accuracy= 0.773931799050488	precision= 0.7695672831961589	recall= 0.5768303926541791	f-score= 0.6594036904579357
-P	QRS_model_12	accuracy= 0.8581109849875422	precision= 0.26465027878249414	recall= 0.789748804278236	f-score= 0.39644807090246376
-PQ	QRS_model_12	accuracy= 0.953738625545445	precision= 0.412493274394168	recall= 0.44685082115224173	f-score= 0.4289852210262993
-QRS_model_12	accuracy= 0.8743897401982876	precision= 0.6221832197184175	recall= 0.6234125904395382	f-score= 0.6227972984004881
-QRS	QRS_model_16	accuracy= 0.9425239489101768	precision= 0.7496856172505773	recall= 0.8464765836318137	f-score= 0.7951464077239282
-ST	QRS_model_16	accuracy= 0.9127319224283755	precision= 0.6914870936411803	recall= 0.597037718804861	f-score= 0.6408008180871907
-T	QRS_model_16	accuracy= 0.8629345448307065	precision= 0.7490681872005538	recall= 0.7067006508673361	f-score= 0.7272679035240619
-ISO	QRS_model_16	accuracy= 0.8317536282254473	precision= 0.8194998002483108	recall= 0.7137233906708169	f-score= 0.7629628609213137
-P	QRS_model_16	accuracy= 0.9186523721354419	precision= 0.40105505580379114	recall= 0.7673257259066772	f-score= 0.5267800817001913
-PQ	QRS_model_16	accuracy= 0.9465626191667726	precision= 0.35836484627166604	recall= 0.4732968376781449	f-score= 0.4078892938047867
-QRS_model_16	accuracy= 0.9025265059494868	precision= 0.7065935169720151	recall= 0.7079896738498753	f-score= 0.7072909064256525
-QRS	QRS_model_18	accuracy= 0.9543092927193713	precision= 0.8161982683191203	recall= 0.8431477696609129	f-score= 0.829454175058146
-ST	QRS_model_18	accuracy= 0.9051412490144436	precision= 0.7673922207575828	recall= 0.39094612329771095	f-score= 0.5179989340656362
-T	QRS_model_18	accuracy= 0.8590616524992467	precision= 0.6732105001439451	recall= 0.8841861752134181	f-score= 0.7644082290071685
-ISO	QRS_model_18	accuracy= 0.8369265217124637	precision= 0.8862979731274289	recall= 0.6540655411603313	f-score= 0.7526755315169087
-P	QRS_model_18	accuracy= 0.9084208074851622	precision= 0.36961008276578633	recall= 0.7823824050013182	f-score= 0.502045679182405
-PQ	QRS_model_18	accuracy= 0.9459946186618833	precision= 0.35721662034976953	recall= 0.48625698579412335	f-score= 0.41186606390908304
-QRS_model_18	accuracy= 0.9016423570154285	precision= 0.7039410701698402	recall= 0.705331986082765	f-score= 0.704635841727358
-QRS	QRS_model_9_ST	accuracy= 0.950232400206578	precision= 0.8089680692530515	recall= 0.8147331215303776	f-score= 0.8118403608030018
-ST	QRS_model_9_ST	accuracy= 0.8640972125308556	precision= 0.48656073302732844	recall= 0.7667774539380614	f-score= 0.5953441839353039
-T	QRS_model_9_ST	accuracy= 0.8389727457535517	precision= 0.7493548269845886	recall= 0.5669265896579638	f-score= 0.6454990112824366
-ISO	QRS_model_9_ST	accuracy= 0.804857159873031	precision= 0.8427726106054191	recall= 0.5970014093235598	f-score= 0.6989102863455608
-P	QRS_model_9_ST	accuracy= 0.8950079066736948	precision= 0.33464804758541117	recall= 0.7886189884382179	f-score= 0.46989682115817016
-PQ	QRS_model_9_ST	accuracy= 0.943554172048153	precision= 0.34962085452386027	recall= 0.5248288551869165	f-score= 0.41967219107412945
-QRS_model_9_ST	accuracy= 0.882786932847644	precision= 0.6473747976664869	recall= 0.6486539443818271	f-score= 0.6480137397818603
-QRS	QRS_model_9_T	accuracy= 0.9460439520390684	precision= 0.7724535617926128	recall= 0.8371646734254744	f-score= 0.8035083346416485
-ST	QRS_model_9_T	accuracy= 0.8872096775197134	precision= 0.648550044665981	recall= 0.29450324691926166	f-score= 0.4050674456004464
-T	QRS_model_9_T	accuracy= 0.8299118488105323	precision= 0.6238132601507835	recall= 0.8622144613888034	f-score= 0.7238906869797221
-ISO	QRS_model_9_T	accuracy= 0.794975373311443	precision= 0.8721549728683642	recall= 0.5385162388516415	f-score= 0.6658810526262421
-P	QRS_model_9_T	accuracy= 0.8887425677711713	precision= 0.3244391083076482	recall= 0.8182126313410915	f-score= 0.46463881742299334
-PQ	QRS_model_9_T	accuracy= 0.9465786191809948	precision= 0.3736153305040854	recall= 0.5523720271088812	f-score= 0.445739686989883
-QRS_model_9_T	accuracy= 0.8822436731054872	precision= 0.6457450184400164	recall= 0.6470209448774716	f-score= 0.6463823520056127
-QRS	QRS_model_9_ISO	accuracy= 0.945842618526772	precision= 0.7728840889488882	recall= 0.8341461440395006	f-score= 0.8023474224095143
-ST	QRS_model_9_ISO	accuracy= 0.8875696778397136	precision= 0.6374296467193423	recall= 0.3192786896422423	f-score= 0.4254540168797071
-T	QRS_model_9_ISO	accuracy= 0.8223211753966003	precision= 0.7393914689948983	recall= 0.4832281782417473	f-score= 0.5844741549466324
-ISO	QRS_model_9_ISO	accuracy= 0.743717105526316	precision= 0.6278564761256715	recall= 0.7966684668832393	f-score= 0.7022600182784207
-P	QRS_model_9_ISO	accuracy= 0.9007492451104401	precision= 0.2640416938110749	recall= 0.3815990660189056	f-score= 0.31211803844258257
-PQ	QRS_model_9_ISO	accuracy= 0.9410186142387682	precision= 0.3231439681409559	recall= 0.4720282517514486	f-score= 0.383647915582968
-QRS_model_9_ISO	accuracy= 0.873536406106435	precision= 0.61962321744286	recall= 0.6208475298600216	f-score= 0.6202347694691583
-QRS	QRS_model_9_P	accuracy= 0.9217559304497159	precision= 0.6427469300397477	recall= 0.9146042859744622	f-score= 0.7549473631462682
-ST	QRS_model_9_P	accuracy= 0.8595594307194939	precision= 0.4602715491217478	recall= 0.4469806207496037	f-score= 0.453528731199383
-T	QRS_model_9_P	accuracy= 0.8498171998375109	precision= 0.7510900938365951	recall= 0.6270342826795728	f-score= 0.6834785687589747
-ISO	QRS_model_9_P	accuracy= 0.776447356842095	precision= 0.8501444088027451	recall= 0.49863460797257736	f-score= 0.6285854372452028
-P	QRS_model_9_P	accuracy= 0.8439340834969631	precision= 0.24031516587114157	recall= 0.7610966745753776	f-score= 0.3652904154059164
-PQ	QRS_model_9_P	accuracy= 0.9348154976137757	precision= 0.28299810747766385	recall= 0.44091932479228335	f-score= 0.34473360884619686
-QRS_model_9_P	accuracy= 0.8643882498265925	precision= 0.5921787486033321	recall= 0.5933488335431547	f-score= 0.592763213651517
-QRS	QRS_model_9_PQ	accuracy= 0.9211843743861106	precision= 0.6427016398468167	recall= 0.9050630349879596	f-score= 0.7516459138900987
-ST	QRS_model_9_PQ	accuracy= 0.867938104833871	precision= 0.49263635585238463	recall= 0.4314806292717015	f-score= 0.4600349268480609
-T	QRS_model_9_PQ	accuracy= 0.8182576162289922	precision= 0.7127589677463808	recall= 0.4978112501912041	f-score= 0.5862021509554629
-ISO	QRS_model_9_PQ	accuracy= 0.7831335850076311	precision= 0.8612019914651493	recall= 0.5106671618238497	f-score= 0.641150908137533
-P	QRS_model_9_PQ	accuracy= 0.8963079078292514	precision= 0.26026495750951384	recall= 0.41107219523217714	f-score= 0.31873012535807205
-PQ	QRS_model_9_PQ	accuracy= 0.8281594028083581	precision= 0.17003534130167175	recall= 0.8808786386130127	f-score= 0.2850480682997006
-QRS_model_9_PQ	accuracy= 0.8524968318490357	precision= 0.5565044946706619	recall= 0.5576040909153659	f-score= 0.5570537501565433
-QRS	QRS_model_11_ST	accuracy= 0.9360008320007396	precision= 0.7071592353919214	recall= 0.8778827798800682	f-score= 0.7833267628267824
-ST	QRS_model_11_ST	accuracy= 0.879346559419164	precision= 0.5271964031405415	recall= 0.7230761364217416	f-score= 0.6097920673387897
-T	QRS_model_11_ST	accuracy= 0.8375300778045136	precision= 0.7316218520152671	recall= 0.5870764936692109	f-score= 0.6514272092302558
-ISO	QRS_model_11_ST	accuracy= 0.796782930473716	precision= 0.8495430999359758	recall= 0.5642776894591267	f-score= 0.6781315158520429
-P	QRS_model_11_ST	accuracy= 0.9059759164230369	precision= 0.3624834625494378	recall= 0.7821413776221142	f-score= 0.4953820759667586
-PQ	QRS_model_11_ST	accuracy= 0.944132394784351	precision= 0.38004056947994447	recall= 0.6916079040903325	f-score= 0.4905322374073893
-QRS_model_11_ST	accuracy= 0.8832947851509201	precision= 0.6488983545763152	recall= 0.6501805116850533	f-score= 0.6495388004027974
-QRS	QRS_model_11_T	accuracy= 0.9402759469119528	precision= 0.7201555672037827	recall= 0.8943008816129402	f-score= 0.7978360260146261
-ST	QRS_model_11_T	accuracy= 0.8905221249085554	precision= 0.7395383424333795	recall= 0.24747831126110004	f-score= 0.37085433039693705
-T	QRS_model_11_T	accuracy= 0.8116496103552092	precision= 0.5874666433497547	recall= 0.9122317342082603	f-score= 0.7146846630921571
-ISO	QRS_model_11_T	accuracy= 0.7659202363735435	precision= 0.8804037197698881	recall= 0.44319652858888403	f-score= 0.5895917182587147
-P	QRS_model_11_T	accuracy= 0.8981372427886603	precision= 0.342796682013225	recall= 0.79187285805747	f-score= 0.47846774542219145
-PQ	QRS_model_11_T	accuracy= 0.9503390669680595	precision= 0.4156880478641993	recall= 0.6828763757300084	f-score= 0.5167899878480707
-QRS_model_11_T	accuracy= 0.8761407047176635	precision= 0.6274361132765451	recall= 0.6286758631807374	f-score= 0.6280553764281595
-QRS	QRS_model_11_ISO	accuracy= 0.9117483659985476	precision= 0.6073986831773938	recall= 0.9340274264591807	f-score= 0.7361066811261375
-ST	QRS_model_11_ISO	accuracy= 0.8888856790094924	precision= 0.60177498121713	recall= 0.43685636856368565	f-score= 0.5062224109497052
-T	QRS_model_11_ISO	accuracy= 0.8452594180083716	precision= 0.7680873765244427	recall= 0.5753206643074803	f-score= 0.6578738942705479
-ISO	QRS_model_11_ISO	accuracy= 0.816570948063065	precision= 0.7480522023279051	recall= 0.778807663065062	f-score= 0.7631201798545255
-P	QRS_model_11_ISO	accuracy= 0.9233199318399394	precision= 0.37572117037435226	recall= 0.45274733551764396	f-score= 0.4106535313648598
-PQ	QRS_model_11_ISO	accuracy= 0.9536724032643584	precision= 0.4133625954988716	recall= 0.4563480725494006	f-score= 0.433793054748312
-QRS_model_11_ISO	accuracy= 0.8899094576972957	precision= 0.668742372215442	recall= 0.6700637390834628	f-score= 0.6694024035720586
+
+
+0.9197 0.6356 0.9165 0.7506
+QRS	QRS_model_6	        accuracy= 0.9197	precision= 0.6356	recall= 0.9165	f-score= 0.7506
+QRS	QRS_model_9	        accuracy= 0.9035	precision= 0.5822	recall= 0.9505	f-score= 0.7221 ___
+QRS	QRS_model_12	    accuracy= 0.9345	precision= 0.7013	recall= 0.8765	f-score= 0.7792
+QRS	QRS_model_16	    accuracy= 0.9425	precision= 0.7496	recall= 0.8464	f-score= 0.7951
+QRS	QRS_model_18	    accuracy= 0.9543	precision= 0.8161	recall= 0.8431	f-score= 0.8294 +
+QRS	QRS_model_22	    accuracy= 0.9547    precision= 0.8220	recall= 0.8380	f-score= 0.8300
+QRS	QRS_model_9_P	    accuracy= 0.9217	precision= 0.6427	recall= 0.9146	f-score= 0.7549
+QRS	QRS_model_9_PQ	    accuracy= 0.9211	precision= 0.6427	recall= 0.9050	f-score= 0.7516
+QRS	QRS_model_9_ISO	    accuracy= 0.9458    precision= 0.7728	recall= 0.8341	f-score= 0.8023
+QRS	QRS_model_9_ST	    accuracy= 0.9502    precision= 0.8089	recall= 0.8147	f-score= 0.8118
+QRS	QRS_model_9_T	    accuracy= 0.9460	precision= 0.7724	recall= 0.8371	f-score= 0.8035
+QRS	QRS_model_11_P	    accuracy= 0.911     precision= 0.6054	recall= 0.9368  f-score= 0.7355
+QRS	QRS_model_11_PQ	    accuracy= 0.915     precision= 0.6213	recall= 0.9159 	f-score= 0.7404
+QRS	QRS_model_11_ISO	accuracy= 0.9117	precision= 0.6073	recall= 0.9340	f-score= 0.7361
+QRS	QRS_model_11_ST	    accuracy= 0.9360	precision= 0.7071	recall= 0.8778	f-score= 0.7833
+QRS	QRS_model_11_T	    accuracy= 0.9402	precision= 0.7201	recall= 0.8943	f-score= 0.7978
+QRS	QRS_model_18_ES	    accuracy= 0.954     precision= 0.8439	recall= 0.8000 	f-score= 0.8213
+
+ST	QRS_model_6	        accuracy= 0.8553    precision= 0.4448   recall= 0.4424  f-score= 0.4436
+ST	QRS_model_9	        accuracy= 0.8676	precision= 0.4910   recall= 0.4148  f-score= 0.4497
+ST	QRS_model_12	    accuracy= 0.8915	precision= 0.7480   recall= 0.2539  f-score= 0.3792
+ST	QRS_model_16	    accuracy= 0.9127	precision= 0.6914   recall= 0.5970  f-score= 0.6408 +
+ST	QRS_model_18	    accuracy= 0.9051	precision= 0.7673   recall= 0.3909  f-score= 0.5179
+ST	QRS_model_22	    accuracy= 0.9051	precision= 0.7745	recall= 0.3840	f-score= 0.5135
+ST	QRS_model_9_P	    accuracy= 0.8595	precision= 0.4602   recall= 0.4469  f-score= 0.4535
+ST	QRS_model_9_PQ	    accuracy= 0.8679    precision= 0.4926   recall= 0.4314  f-score= 0.4600
+ST	QRS_model_9_ISO	    accuracy= 0.8875	precision= 0.6374   recall= 0.3192  f-score= 0.4254
+ST	QRS_model_9_ST	    accuracy= 0.8640	precision= 0.4865   recall= 0.7667  f-score= 0.5953 __
+ST	QRS_model_9_T	    accuracy= 0.8872	precision= 0.6485   recall= 0.2945  f-score= 0.4050
+ST	QRS_model_11_P	    accuracy= 0.8682	precision= 0.4938   recall= 0.4238  f-score= 0.4561
+ST	QRS_model_11_PQ	    accuracy= 0.8650	precision= 0.4795   recall= 0.4114  f-score= 0.4429
+ST	QRS_model_11_ST	    accuracy= 0.8793    precision= 0.5271   recall= 0.7230  f-score= 0.6097 __
+ST	QRS_model_11_T	    accuracy= 0.8905	precision= 0.7395   recall= 0.2474  f-score= 0.3708
+ST	QRS_model_11_ISO	accuracy= 0.8888	precision= 0.6017   recall= 0.4368  f-score= 0.5062
+ST	QRS_model_18_ES	    accuracy= 0.9190	precision= 0.6790   recall= 0.7191  f-score= 0.6985
+
+T	QRS_model_6	        accuracy= 0.8372    precision= 0.7363	recall= 0.5772	f-score= 0.6471
+T	QRS_model_9	        accuracy= 0.8475    precision= 0.7410	recall= 0.6307	f-score= 0.6814
+T	QRS_model_12	    accuracy= 0.8344    precision= 0.6612	recall= 0.7376	f-score= 0.6973
+T	QRS_model_16	    accuracy= 0.8629    precision= 0.7490	recall= 0.7067	f-score= 0.7272
+T	QRS_model_18	    accuracy= 0.8590    precision= 0.6732	recall= 0.8841	f-score= 0.7644 +
+T	QRS_model_22	    accuracy= 0.8634	precision= 0.6891	recall= 0.8595	f-score= 0.7649
+T	QRS_model_9_P	    accuracy= 0.8498    precision= 0.7510	recall= 0.6270	f-score= 0.6834
+T	QRS_model_9_PQ	    accuracy= 0.8182    precision= 0.7127	recall= 0.4978	f-score= 0.5862
+T	QRS_model_9_ISO	    accuracy= 0.8223    precision= 0.7393	recall= 0.4832	f-score= 0.5844
+T	QRS_model_9_ST	    accuracy= 0.8389    precision= 0.7493	recall= 0.5669	f-score= 0.6454
+T	QRS_model_9_T	    accuracy= 0.8299    precision= 0.6238	recall= 0.8622	f-score= 0.7238 __
+T	QRS_model_11_P	    accuracy= 0.8517	precision= 0.7462	recall= 0.6464	f-score= 0.6927
+T	QRS_model_11_PQ	    accuracy= 0.8305    precision= 0.7275	recall= 0.5510	f-score= 0.6271
+T	QRS_model_11_ISO	accuracy= 0.8452    precision= 0.7680	recall= 0.5753	f-score= 0.6578
+T	QRS_model_11_ST	    accuracy= 0.8375    precision= 0.7316	recall= 0.5870	f-score= 0.6514
+T	QRS_model_11_T	    accuracy= 0.8116    precision= 0.5874	recall= 0.9122	f-score= 0.7146 __
+T	QRS_model_18_ES	    accuracy= 0.8657	precision= 0.7459	recall= 0.7288	f-score= 0.7373
+
+ISO	QRS_model_6	        accuracy= 0.8119	precision= 0.8329	recall= 0.6307  f-score= 0.7178
+ISO	QRS_model_9	        accuracy= 0.7996	precision= 0.8469	recall= 0.5759  f-score= 0.6856
+ISO	QRS_model_12	    accuracy= 0.7739    precision= 0.7695	recall= 0.5768  f-score= 0.6594
+ISO	QRS_model_16	    accuracy= 0.8317	precision= 0.8194	recall= 0.7137  f-score= 0.7629
+ISO	QRS_model_18	    accuracy= 0.8369	precision= 0.8862	recall= 0.6540  f-score= 0.7526
+ISO	QRS_model_22	    accuracy= 0.8466	precision= 0.8706	recall= 0.6998	f-score= 0.7759
+ISO	QRS_model_9_P	    accuracy= 0.7764	precision= 0.8501	recall= 0.4986  f-score= 0.6285
+ISO	QRS_model_9_PQ	    accuracy= 0.7831	precision= 0.8612	recall= 0.5106  f-score= 0.6411
+ISO	QRS_model_9_ISO	    accuracy= 0.7437    precision= 0.6278	recall= 0.7966  f-score= 0.7022 __
+ISO	QRS_model_9_ST	    accuracy= 0.8048    precision= 0.8427	recall= 0.5970  f-score= 0.6989
+ISO	QRS_model_9_T	    accuracy= 0.7949    precision= 0.8721	recall= 0.5385  f-score= 0.6658
+ISO	QRS_model_11_P	    accuracy= 0.7747	precision= 0.8564   recall= 0.4879  f-score= 0.6217
+ISO	QRS_model_11_PQ	    accuracy= 0.7815	precision= 0.8642   recall= 0.5031  f-score= 0.6360
+ISO	QRS_model_11_ISO	accuracy= 0.8165    precision= 0.7480	recall= 0.7788  f-score= 0.7631 __ +
+ISO	QRS_model_11_ST	    accuracy= 0.7967    precision= 0.8495	recall= 0.5642  f-score= 0.6781
+ISO	QRS_model_11_T	    accuracy= 0.7659	precision= 0.8804	recall= 0.4431  f-score= 0.5895
+ISO	QRS_model_18_ES	    accuracy= 0.8204	precision= 0.8389   recall= 0.6518  f-score= 0.7336
+
+P	QRS_model_6	        accuracy= 0.8907	precision= 0.3049   recall= 0.6659  f-score= 0.4183
+P	QRS_model_9	        accuracy= 0.9058	precision= 0.3618   recall= 0.7804  f-score= 0.4944
+P	QRS_model_12	    accuracy= 0.8581	precision= 0.2646   recall= 0.7897  f-score= 0.3964
+P	QRS_model_16	    accuracy= 0.9186	precision= 0.4010   recall= 0.7673  f-score= 0.5267
+P	QRS_model_18	    accuracy= 0.9084	precision= 0.3696   recall= 0.7823  f-score= 0.5020 +
+P	QRS_model_22	    accuracy= 0.9111	precision= 0.3643	recall= 0.6794	f-score= 0.4743
+P	QRS_model_9_PQ	    accuracy= 0.8963	precision= 0.2602   recall= 0.4110  f-score= 0.3187
+P	QRS_model_9_P	    accuracy= 0.8439	precision= 0.2403   recall= 0.7610  f-score= 0.3652 __
+P	QRS_model_9_ISO	    accuracy= 0.9007	precision= 0.2640   recall= 0.3815  f-score= 0.3121
+P	QRS_model_9_ST	    accuracy= 0.8950	precision= 0.3346   recall= 0.7886  f-score= 0.4698
+P	QRS_model_9_T	    accuracy= 0.8887	precision= 0.3244   recall= 0.8182  f-score= 0.4646
+P	QRS_model_11_P	    accuracy= 0.8425	precision= 0.2421	recall= 0.7828	f-score= 0.3698 __
+P	QRS_model_11_PQ	    accuracy= 0.8921	precision= 0.2461	recall= 0.4008	f-score= 0.3049
+P	QRS_model_11_ISO	accuracy= 0.9233	precision= 0.3757   recall= 0.4527  f-score= 0.4106
+P	QRS_model_11_ST	    accuracy= 0.9059	precision= 0.3624   recall= 0.7821  f-score= 0.4953
+P	QRS_model_11_T	    accuracy= 0.8981	precision= 0.3427   recall= 0.7918  f-score= 0.4784
+P	QRS_model_18_ES	    accuracy= 0.9049	precision= 0.3433	recall= 0.6702	f-score= 0.4540
+
+PQ	QRS_model_6	        accuracy= 0.9380	precision= 0.3120   recall= 0.4930  f-score= 0.3821
+PQ	QRS_model_9	        accuracy= 0.9452	precision= 0.3856   recall= 0.6875  f-score= 0.4941
+PQ	QRS_model_12	    accuracy= 0.9537    precision= 0.4124   recall= 0.4468  f-score= 0.4289
+PQ	QRS_model_16	    accuracy= 0.9465	precision= 0.3583   recall= 0.4732  f-score= 0.4078
+PQ	QRS_model_18	    accuracy= 0.9459	precision= 0.3572   recall= 0.4862  f-score= 0.4118
+PQ	QRS_model_22	    accuracy= 0.9376	precision= 0.3154	recall= 0.5148	f-score= 0.3912
+PQ	QRS_model_11_T	    accuracy= 0.9503	precision= 0.4156   recall= 0.6828  f-score= 0.5167 +
+PQ	QRS_model_9_P	    accuracy= 0.9348	precision= 0.2829   recall= 0.4409  f-score= 0.3447
+PQ	QRS_model_9_PQ	    accuracy= 0.8281	precision= 0.1700   recall= 0.8808  f-score= 0.2850 __
+PQ	QRS_model_9_ISO	    accuracy= 0.9410	precision= 0.3231   recall= 0.4720  f-score= 0.3836
+PQ	QRS_model_9_ST	    accuracy= 0.9435    precision= 0.3496   recall= 0.5248  f-score= 0.4196
+PQ	QRS_model_9_T	    accuracy= 0.9465	precision= 0.3736   recall= 0.5523  f-score= 0.4457
+PQ	QRS_model_11_P	    accuracy= 0.9404	precision= 0.3061   recall= 0.4187  f-score= 0.3536
+PQ	QRS_model_11_PQ	    accuracy= 0.8477	precision= 0.1869   recall= 0.8705  f-score= 0.3078 __
+PQ	QRS_model_11_ISO	accuracy= 0.9536	precision= 0.4133   recall= 0.4563  f-score= 0.4337
+PQ	QRS_model_11_ST	    accuracy= 0.9441    precision= 0.3800   recall= 0.6916  f-score= 0.4905
+PQ	QRS_model_18_ES	    accuracy= 0.9332	precision= 0.3124   recall= 0.5975  f-score= 0.4103
+
+QRS_model_6	            accuracy= 0.8754	precision= 0.6254	recall= 0.6267	f-score= 0.6261
+QRS_model_9_P	        accuracy= 0.8643	precision= 0.5921	recall= 0.5933	f-score= 0.5927
+QRS_model_9_PQ	        accuracy= 0.8524	precision= 0.5565	recall= 0.5576	f-score= 0.5570
+QRS_model_9_ISO	        accuracy= 0.8735    precision= 0.6196   recall= 0.6208	f-score= 0.6202
+QRS_model_9_ST	        accuracy= 0.8827    precision= 0.6473	recall= 0.6486	f-score= 0.6480
+QRS_model_9_T	        accuracy= 0.8822	precision= 0.6457	recall= 0.6470	f-score= 0.6463
+QRS_model_9	            accuracy= 0.8782	precision= 0.6337	recall= 0.6350	f-score= 0.6343
+QRS_model_11_P	        accuracy= 0.8648	precision= 0.5935	recall= 0.5946	f-score= 0.5940
+QRS_model_11_PQ	        accuracy= 0.8554	precision= 0.5652	recall= 0.5663	f-score= 0.5658
+QRS_model_11_ISO	    accuracy= 0.8899	precision= 0.6687	recall= 0.6700	f-score= 0.6694
+QRS_model_11_ST	        accuracy= 0.8832	precision= 0.6488	recall= 0.6501	f-score= 0.6495
+QRS_model_11_T	        accuracy= 0.8761	precision= 0.6274	recall= 0.6286	f-score= 0.6280
+QRS_model_12	        accuracy= 0.8743	precision= 0.6221	recall= 0.6234	f-score= 0.6227
+QRS_model_16	        accuracy= 0.9025	precision= 0.7065	recall= 0.7079	f-score= 0.7072
+QRS_model_18	        accuracy= 0.9016	precision= 0.7039	recall= 0.7053	f-score= 0.7046 +
+QRS_model_18_ES	        accuracy= 0.8995	precision= 0.6977	recall= 0.6991	f-score= 0.6984
+QRS_model_22	        accuracy= 0.9031	precision= 0.7084	recall= 0.7098	f-score= 0.7091
