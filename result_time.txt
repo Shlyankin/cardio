@@ -14,3 +14,7 @@ QRS_model_11_P is trained for 62.70915227333705 min
 QRS_model_11_PQ is trained for 61.243302913506824 min
 QRS_model_18_ES is trained for 191.35620562632877 min
 QRS_model_22 is trained for 491.8248597343763 min
+QRS_model_6 is trained for 47.84688668648402 min
+QRS_model_8 is trained for 69.28376280069351 min
+QRS_model_11 is trained for 110.37941334247589 min
+QRS_model_14 is trained for 161.13888328472774 min
