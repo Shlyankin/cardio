@@ -24,6 +24,7 @@ import keras.backend.tensorflow_backend as KTF
 
 np.random.seed(0)
 
+annot_type = "pu1"
 
 # functions
 def get_ecg_data(datfile):
@@ -33,7 +34,7 @@ def get_ecg_data(datfile):
     cwd = os.getcwd()
     os.chdir(recordpath)  ## somehow it only works if you chdir.
 
-    annotator = 'q1c'
+    annotator = annot_type
     annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None)
     Lstannot = list(zip(annotation.sample, annotation.symbol, annotation.aux_note))
 
@@ -44,7 +45,7 @@ def get_ecg_data(datfile):
     record = wfdb.rdsamp(recordname, sampfrom=FirstLstannot, sampto=LastLstannot)  # wfdb.showanncodes()
     annotation = wfdb.rdann(recordname, annotator, sampfrom=FirstLstannot,
                             sampto=LastLstannot)  ## get annotation between first and last.
-    annotation2 = wfdb.Annotation(record_name='sel32', extension='niek', sample=(annotation.sample - FirstLstannot),
+    annotation2 = wfdb.Annotation(record_name=recordname, extension=annot_type, sample=(annotation.sample - FirstLstannot),
                                   symbol=annotation.symbol, aux_note=annotation.aux_note)
 
     Vctrecord = np.transpose(record[0])
@@ -217,7 +218,7 @@ def LoaddDatFiles(datfiles):
         print(datfile)
         if basename(datfile).split(".", 1)[0] in exclude:
             continue
-        qf = os.path.splitext(datfile)[0] + '.q1c'
+        qf = os.path.splitext(datfile)[0] + '.' + annot_type
         if os.path.isfile(qf):
             # print("yes",qf,datfile)
             x, y = get_ecg_data(datfile)
@@ -255,7 +256,7 @@ def get_session(gpu_fraction=0.8):
 
 def getmodel():
     model = Sequential()
-    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features)))
+    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features))) # 1300 2
     model.add(Bidirectional(
         LSTM(32, return_sequences=True)))  # , input_shape=(seqlength, features)) ) ### bidirectional ---><---
     model.add(Dropout(0.2))
@@ -263,7 +264,7 @@ def getmodel():
     model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
     model.add(Dropout(0.2))
     model.add(BatchNormalization())
-    model.add(Dense(dimout, activation='softmax'))
+    model.add(Dense(dimout, activation='softmax')) # 6
     adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     print(model.summary())
@@ -272,7 +273,7 @@ def getmodel():
 
 ##################################################################
 ##################################################################
-qtdbpath = "C:\\Users\\user\\PycharmProjects\\science_qrs\\data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
+qtdbpath = "data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
 perct = 0.81  # percentage training
 percv = 0.19  # percentage validation
 
@@ -311,7 +312,7 @@ print("xxv/validation shape: {}, Seqlength: {}, Features: {}".format(xxv.shape[0
 
 # call keras/tensorflow and build lstm model 
 KTF.set_session(get_session())
-with tf.device('/cpu:0'):  # switch to /cpu:0 to use cpu
+with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
     if not os.path.isfile('model.h5'):
         model = getmodel()  # build model
         model.fit(xxt, yyt, batch_size=32, epochs=100, verbose=1)  # train the model
