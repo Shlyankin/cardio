@@ -110,22 +110,51 @@ def plot_time():
     plt.rc('figure', titlesize=48)  # fontsize of the figure title
     plt.show()
 
-def plot_pp_lab2():
+def plot_pp_lab1():
     times = {
-        "MPI point-to-point":   [0.007245,	0.001610,	0.000511],
-        "MPI collective op":    [0.007560,	0.001936,	0.000409],
-        "OpenMP critical":      [0.643088,	5.352996,	17.11621],
-        "OpenMP atomic":        [0.564927,	1.874943,	3.241068],
-        "OpenMP reduce":        [0.059364,	0.014687,	0.006846]
+        "MPI":    [1.847744e-06, 7.708867e-06, 1.568397e-04],
+        "OpenMP": [5.316734e-05, 1.015862e-04, 2.466142e-03]
     }
-    nodes = [1, 4, 16]
+    nodes = [1, 3, 9]
 
     ax1: plt.Axes
     _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
     for item in times.keys():
         ax1.plot(nodes, times[item], label=item)
     ax1.legend(shadow=True, ncol=2)
-    ax1.xaxis.set_major_locator(ticker.MultipleLocator(4))
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(3))
+    ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+    ax1.yaxis.set_major_locator(ticker.MultipleLocator(1e-03))
+    ax1.yaxis.set_minor_locator(ticker.MultipleLocator(1e-04))
+    #  Добавляем линии основной сетки:
+    ax1.grid(which='major', color='k')
+    ax1.minorticks_on()
+    ax1.grid(which='minor', color='gray', linestyle=':')
+    ax1.set_ylim(ymin=0, ymax=3e-03)
+    ax1.set_xlim(xmin=nodes[0], xmax=nodes[-1])
+    ax1.set_title("Параллельные алгоритмы поиска суммы элементов массива")
+    ax1.set_xlabel("Количество нитей, шт")
+    ax1.set_ylabel("Среднее время работы, с")
+    plt.rc('legend', fontsize=22)  # legend fontsize
+    plt.rc('figure', titlesize=48)  # fontsize of the figure title
+    plt.show()
+
+def plot_pp_lab2():
+    times = {
+        "MPI point-to-point":   [0.000494, 0.000949],
+        "MPI collective op":    [0.000505, 0.000959],
+        "OpenMP critical":      [1.624782, 1.256059],
+        "OpenMP atomic":        [0.682222, 0.398773],
+        "OpenMP reduce":        [0.004565, 0.008743]
+    }
+    nodes = [2, 4]
+
+    ax1: plt.Axes
+    _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
+    for item in times.keys():
+        ax1.plot(nodes, times[item], label=item)
+    ax1.legend(shadow=True, ncol=2)
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(2))
     ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
     ax1.yaxis.set_major_locator(ticker.MultipleLocator(1.0))
     ax1.yaxis.set_minor_locator(ticker.MultipleLocator(0.1))
@@ -133,7 +162,7 @@ def plot_pp_lab2():
     ax1.grid(which='major', color='k')
     ax1.minorticks_on()
     ax1.grid(which='minor', color='gray',linestyle=':')
-    ax1.set_ylim(ymin=0, ymax=18)
+    ax1.set_ylim(ymin=0, ymax=1.8)
     ax1.set_xlim(xmin=nodes[0], xmax=nodes[-1])
     ax1.set_title("Параллельные алгоритмы поиска суммы элементов массива")
     ax1.set_xlabel("Количество нитей, шт")
@@ -145,23 +174,35 @@ def plot_pp_lab2():
 
 def plot_pp_lab3():
     """
-0.009933,	0.004820,	0.005470
-0.009940,	0.029388,	0.025807
-0.011239,	0.010591,	0.009833
-0.010976,	0.004974,	0.005628
-0.010976,	0.029184,	0.026489
+times = {
+        "MPI кратно":          [0.000884,   0.008392,   0.030042],
+        "MPI не кратно":       [0.000879,   0.008379,   0.030013],
+        "OpenMP Static":       [0.000364,   0.000589,   0.001192],
+        "OpenMP Guided":       [0.000103,   0.000403,   0.000783],
+        "OpenMP Dynamic":      [0.000479,   0.001624,	0.003175],
+    }
+
+times = {
+    "MPI кратно":          [0.001012, 0.009576, 0.034068],
+    "MPI не кратно":       [0.000980, 0.009416, 0.033776],
+    "OpenMP Static":       [0.000406, 0.000327, 0.000629],
+    "OpenMP Guided":       [0.000083, 0.000309, 0.000625],
+    "OpenMP Dynamic":      [0.000403, 0.001083, 0.002171],
+}
+0.000936, 0.008803, 0.035320
+0.007908, 0.035017, 0.056273
+0.001571, 0.000313, 0.000613
+0.000833, 0.000949, 0.000621
+0.001290, 0.000310, 0.001898
 """
     times = {
-        "MPI с размером вектора кратным количеству нитей":          [0.015797, 	0.019741,	0.010472],
-        "MPI с размером вектора не кратным количеству нитей":       [0.015424,	0.019883, 	0.010412],
-        "OpenMP Static chunk = 10":                                 [0.010159,	0.009815,	0.010450],
-        "OpenMP Guided chunk = 10":                                 [0.009933,	0.004820,	0.005470],
-        "OpenMP Dynamic chunk = 10":                                [0.009940,	0.029388,	0.025807],
-        "OpenMP Static chunk = 100":                                [0.011239,	0.010591,	0.009833],
-        "OpenMP Guided chunk = 100":                                [0.010976,	0.004974,	0.005628],
-        "OpenMP Dynamic chunk = 100":                               [0.010976,	0.029184,	0.026489]
+        "MPI кратно":          [0.000936, 0.008803, 0.035320],
+        "MPI не кратно":       [0.007908, 0.035017, 0.056273],
+        "OpenMP Static":       [0.001571, 0.000313, 0.000613],
+        "OpenMP Guided":       [0.000833, 0.000949, 0.000621],
+        "OpenMP Dynamic":      [0.001290, 0.000310, 0.001898],
     }
-    nodes = [1, 4, 16]
+    nodes = [1, 4, 8]
 
     ax1: plt.Axes
     _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
@@ -178,8 +219,8 @@ def plot_pp_lab3():
     ax1.grid(which='minor', color='gray',linestyle=':')
     ax1.set_ylim(ymin=0, ymax=0.04)
     ax1.set_xlim(xmin=nodes[0], xmax=nodes[-1])
-    ax1.set_title("Параллельные алгоритмы поиска суммы элементов массива")
-    ax1.set_xlabel("Количество нитей, шт")
+    ax1.set_title("Параллельные алгоритмы поиска суммы векторов")
+    ax1.set_xlabel("Параметр Q")
     ax1.set_ylabel("Среднее время работы, с")
     plt.rc('legend', fontsize=22)    # legend fontsize
     plt.rc('figure', titlesize=48)  # fontsize of the figure title
@@ -266,8 +307,10 @@ def plot_pp_lab5():
     plt.rc('legend', fontsize=22)  # legend fontsize
     plt.rc('figure', titlesize=48)  # fontsize of the figure title
     plt.show()
-plot_time()
 #plot_pp_lab5()
 #plot_pp_lab4()
-#plot_pp_lab3()
+plot_pp_lab3()
+#plot_pp_lab2()
+#plot_pp_lab1()
+#plot_time()
 #plot_metrics()

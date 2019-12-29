@@ -3,7 +3,7 @@ import hmmlearn.hmm as hmm
 
 from functools import partial
 
-from cardio.batchflow import V, F
+from cardio.batchflow import V, F, B
 from cardio.batchflow.batchflow.models import tf
 from cardio.models import DirichletModel, concatenate_ecg_batch
 from cardio.models.hmm import HMModel, prepare_hmm_input
@@ -39,7 +39,7 @@ def HMM_preprocessing_pipeline(batch_size=20):
             .init_variable("annsamps", init_on_each_run=list)
             .init_variable("anntypes", init_on_each_run=list)
             .init_variable(features, init_on_each_run=list)
-            .cwt(src="signal", dst=features, scales=[4, 8, 16], wavelet="mexh") #применяется прод.вейвлет. преобр.
+            .cwt(src="signal", dst=features, scales=[4, 8, 16], wavelet="mexh") #применяется непрерыное вейвлет. преобр.
             .standardize(axis=-1, src=features, dst=features) #преобразуется в посл-ть с единичной дисперсией и c мат.ожиданием 0
             .update_variable("annsamps", bf.F(get_annsamples), mode='e')
             .update_variable("anntypes", bf.F(get_anntypes), mode='e')
@@ -95,17 +95,21 @@ def HMM_train_pipeline(hmm_preprocessed, batch_size=20, features="hmm_features",
     config_train = {
         'build': True,
         'estimator': hmm.GaussianHMM(n_components=states[5], n_iter=n_iter, covariance_type="full", random_state=random_state,
-                                     init_params='', verbose=False),
+                                     init_params='', verbose=True),
         'init_params': {'means_': means, 'covars_': covariances, 'transmat_': transition_matrix,
                         'startprob_': start_probabilities}
     }
 
     return (bf.Pipeline()
             .init_model("dynamic", HMModel, model_name, config=config_train)
+            .init_variable("verbose", init_on_each_run=list)
             .load(fmt='wfdb', components=["signal", "annotation", "meta"], ann_ext='pu1')
             .cwt(src="signal", dst=features, scales=[4, 8, 16], wavelet="mexh")
             .standardize(axis=-1, src=features, dst=features)
-            .train_model(model_name, make_data=partial(prepare_hmm_input, features=features, channel_ix=channel_ix)))
+            .train_model(model_name,
+                         make_data=partial(prepare_hmm_input, features=features, channel_ix=channel_ix),
+                         save_to=V("verbose"))
+            .call(lambda _, v: print(v[-1]), v=V('verbose')))
 
 def HMM_predict_pipeline(model_path, batch_size=20, features="hmm_features",
                          channel_ix=0, annot="hmm_annotation", model_name='HMM'):
@@ -160,6 +164,18 @@ def PanTompkinsPipeline(batch_size=20, annot = "pan_tomp_annotation"):
             .init_variable(annot, init_on_each_run=list)
             .my_pan_tompkins(dst=annot)
             .update_variable(annot, bf.B(annot), mode='e'))
+
+from lstm_main_train import MyLSTM
+def LSTM_train_pipeline(model_name="lstm"):
+    model_config = {
+
+    }
+
+    return (bf.Pipeline()
+            .init_model("dynamic", MyLSTM, name=model_name, config=model_config)
+            .load(fmt='wfdb', components=["signal", "annotation", "meta"], ann_ext='pu1')
+            .train_model(model_name, x=B('signal'), y_true=B('annot'))
+            )
 
 def dirichlet_train_pipeline(labels_path, batch_size=256, n_epochs=1000, gpu_options=None,
                              loss_history='loss_history', model_name='dirichlet'):

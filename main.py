@@ -3,7 +3,7 @@ import numpy as np
 import cardio.batchflow as bf
 from cardio import EcgBatch
 from my_pipelines.my_pipelines import PanTompkinsPipeline, HMM_predict_pipeline, LoadEcgPipeline, HilbertTransformPipeline
-from my_tools import calculate_old_metrics, calculate_metrics, calcuate_metrics_for_all_model, calc_precision
+from my_tools import calculate_old_metrics, calculate_metrics, calc_metr, calc_metr_qrs
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -63,32 +63,52 @@ all_states = {
         #"QRS_model_11":        [3, 4, 6, 8, 10, 11],
         #"QRS_model_16":        [3, 5, 8, 11, 14, 16],
         #"QRS_model_19":        [3, 5, 11, 14, 17, 19],
-        "QRS_model_8_ST":      [1, 4, 5, 6, 7, 8],
-        "QRS_model_8_T":       [1, 2, 5, 6, 7, 8],
-        "QRS_model_8_ISO":     [1, 2, 3, 6, 7, 8],
-        "QRS_model_8_P":       [1, 2, 3, 4, 7, 8],
-        "QRS_model_8_PQ":      [1, 2, 3, 4, 5, 8],
-        "QRS_model_10_ST":     [3, 6, 7, 8, 9, 10],
-        "QRS_model_10_T":      [3, 4, 7, 8, 9, 10],
-        "QRS_model_10_ISO":    [3, 4, 5, 8, 9, 10],
-        "QRS_model_10_P":      [3, 4, 5, 6, 9, 10],
-        "QRS_model_10_PQ":     [3, 4, 5, 6, 7, 10],
-        "QRS_model_18_ES":     [3, 6, 9, 12, 15, 18],
+        #"QRS_model_8_ST":      [1, 4, 5, 6, 7, 8],
+        #"QRS_model_8_T":       [1, 2, 5, 6, 7, 8],
+        #"QRS_model_8_ISO":     [1, 2, 3, 6, 7, 8],
+        #"QRS_model_8_P":       [1, 2, 3, 4, 7, 8],
+        #"QRS_model_8_PQ":      [1, 2, 3, 4, 5, 8],
+        #"QRS_model_10_ST":     [3, 6, 7, 8, 9, 10],
+        #"QRS_model_10_T":      [3, 4, 7, 8, 9, 10],
+        #"QRS_model_10_ISO":    [3, 4, 5, 8, 9, 10],
+        #"QRS_model_10_P":      [3, 4, 5, 6, 9, 10],
+        #"QRS_model_10_PQ":     [3, 4, 5, 6, 7, 10],
+        #"QRS_model_18_ES":     [3, 6, 9, 12, 15, 18],
         #"QRS_model_23":        [3, 5, 13, 18, 21, 23],
               }
 type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 process_states_pipeline = LoadEcgPipeline(batch_size=len(dtst.test), annot_ext="pu1")
 #---------------------------------------NEW METRICS-----------------------------------------
+#"""
+for model_name in all_states.keys():
+    process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline(
+        "" + model_name + ".dill", annot="hmm_annotation" + model_name)
+    batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False,
+                                                                 n_epochs=1, lazy=True).next_batch()
+    metr = calc_metr(batch, "hmm_annotation" + model_name, all_states[model_name], type="macro")
+    for m in metr.keys():
+        print(model_name + "\t" + m + "\t" + str(metr[m]))
+    print()
+#"""
+#--------------------------------------OLD METRICS-----------------------------------------
+"""
 for model_name in all_states.keys():
     process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline(
         "models\\3.2\\" + model_name + ".dill", annot="hmm_annotation" + model_name)
     batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False,
                                                                  n_epochs=1, lazy=True).next_batch()
-    metr = calc_precision(batch, "hmm_annotation" + model_name, all_states[model_name], type="macro")
-    for m in metr.keys():
-        print(model_name + "\t" + m + "\t" + str(metr[m]))
-    print()
-
+    tp = 0
+    fn = 0
+    for state in range(6):
+        print(type_states[state], end="\t")
+        metr = calculate_old_metrics(batch, "hmm_annotation" + model_name, all_states[model_name], state)
+        for m in metr.keys():
+            print(model_name + "\t" + m + "\t" + str(metr[m]))
+        tp = tp + metr["tp"]
+        fn = fn + metr["fn"]
+        print()
+    print("All sensitivity " + str(tp / (tp + fn)))
+"""
 #---------------------------------------MARKOV MODEL----------------------------------------
 """
 for model_name in all_states.keys():
@@ -115,14 +135,18 @@ for model_name in all_states.keys():
 """
 #---------------------------------------Classic methods----------------------------------------
 #---------------------------------------PAN-TOMKINS----------------------------------------
-"""
+#"""
 process_states_pipeline_for_model = process_states_pipeline + PanTompkinsPipeline(annot="pan_tomp_annotation")
 batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False, n_epochs=1, lazy=True).next_batch()
+
+metr = calc_metr_qrs(batch, "pan_tomp_annotation", type="binary")
+for m in metr.keys():
+    print("pan_tomp_annotation" + "\t" + m + "\t" + str(metr[m]))
 #"""
 #OLD METRICS
 """
-parameters = calculate_old_metrics(batch,  np.array(list([1]), np.int64), 0, "pan_tomp_annotation")
-print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]) + "\tspecificity= " + str(parameters["specificity"]))
+parameters = calculate_old_metrics(batch, "pan_tomp_annotation",  np.array(list([1, 2]), np.int64), 1)
+print("Pan-Tompkins" + "\tsensitivity= " + str(parameters["sensitivity"]))
 #"""
 #NEW METRICS
 """

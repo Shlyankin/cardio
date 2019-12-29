@@ -1567,7 +1567,238 @@ class EcgBatch(bf.Batch):
 
 
     @bf.action
-    @bf.inbatch_parallel(init="_init_component", src="signal", dst="qrs_annotation", target="threads")
+    @bf.inbatch_parallel(init="_init_component", target="threads")
+    def my_pan_tompkins5(self, index, src="signal", dst="qrs_annotation"):
+        i = self.get_pos(None, src, index)
+        x, meta = self.signal[i][0], self.meta[i]
+        fs = meta["fs"]
+        from PanTompkinsAlgorithm import pan_tompkins_detect
+        rr = pan_tompkins_detect(x, fs)
+        getattr(self, dst)[i] = rr
+        return self
+
+    @bf.action
+    @bf.inbatch_parallel(init="_init_component", target="async")
+    def my_pan_tompkins4(self, index, src="signal", dst="qrs_annotation"):
+        i = self.get_pos(None, src, index)
+        x, meta = self.signal[i][0], self.meta[i]
+        fs = meta["fs"]
+        from ecgdetectors import Detectors
+
+        detectors = Detectors(fs)
+        x2 = detectors.pan_tompkins_detector(x)
+        i = self.get_pos(None, src, index)
+        getattr(self, dst)[i] = x2
+        return self
+
+    @bf.action
+    @bf.inbatch_parallel(init="_init_component", target="async")
+    def my_pan_tompkins3(self, index, src="signal", dst="qrs_annotation"):
+        i = self.get_pos(None, src, index)
+        x, meta = self.signal[i][0], self.meta[i]
+        fs = meta["fs"]
+        plt.plot(x[0:500])
+        plt.show()
+        x1 = scipy.signal.lfilter([1,0,0,0,0,0,-2,0,0,0,0,0,1],[1,-2,1],x)[12:]
+        plt.plot(x1[0:500])
+        plt.show()
+        x2 =  scipy.signal.lfilter([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,1],x1)[32:]
+        plt.plot(x2[0:500])
+        plt.show()
+        x3 = np.zeros(x.shape)
+        for i in range(2, len(x2) - 2):
+            x3[i] = (-1 * x2[i - 2] - 2 * x2[i - 1] + 2 * x2[i + 1] + x2[i + 2]) / (8)
+        plt.plot(x3[0:500])
+        plt.show()
+        x4 = x3 * x3
+        plt.plot(x4[0:500])
+        plt.show()
+        x5 = np.zeros(x.shape)
+        N = 24
+        for i in range(N, len(x4) - N):
+            for j in range(N):
+                x5[i] += x4[i - j]
+        x5 = x5 / N
+        plt.plot(x5[0:500])
+        plt.show()
+        def threshold(x):
+            pks, _ = scipy.signal.find_peaks(signal, distance=32)
+            peaki = np.average(x[pks[0:int(pks.size * 0.1)]])
+            spki = peaki
+            npki = np.min(x[pks[0:int(pks.size * 0.1)]])
+            peak = [0]
+            threshold1 = spki
+            pk = []
+            rr_avg1 = 0.0
+            for i in pks[1:9] - pks[0:8]:
+                rr_avg1 += i
+            rr_avg1 = rr_avg1 * 0.125
+            rr_avg2 = rr_avg1
+            rr_miss = 1.66 * rr_avg2
+            rr_low = 0.92 * rr_avg2
+            rr_high = 1.16 * rr_avg2
+            for i in range(1, len(x)):
+
+                if (x[i] > threshold1):
+                    spki = 0.875 * spki + 0.125 * peaki
+                    threshold1 = npki + 0.25 * (spki - npki)
+                    threshold2 = 0.5 * threshold1
+                    peak.append(i)
+                    pk.append(x[i])
+                elif(peaki[-1] + rr_missed < i):
+                    1
+                else:
+                   npki = ((npki * (i - 1)) + x[i]) / i
+
+                threshold1 = npki + 0.25 * (spki - npki)
+                threshold2 = 0.5 * threshold1
+
+                if (x[i] >= threshold2):
+
+                    if (peak[-1] + N < i):
+                        peak.append(i)
+                        pk.append(x[i])
+        peak = np.delete(peak, 0)
+        i = self.get_pos(None, src, index)
+        getattr(self, dst)[i] = x5
+        return self
+
+    @bf.action
+    @bf.inbatch_parallel(init="_init_component", target="async")
+    def my_pan_tompkins2(self, index, src="signal", dst="qrs_annotation"):
+        def low_freq_filter(signal):
+            res = np.zeros(len(signal) - 12)
+            for i in range(len(res)):
+                if i >= 1:
+                    res[i] += 2 * res[i - 1]
+                if i >= 2:
+                    res[i] -= res[i - 2]
+                res[i] += (signal[i + 12] - 2 * signal[i + 6] + signal[i])
+            return res
+
+        def high_freq_filter(signal):
+            res = np.zeros(len(signal) - 32)
+            for i in range(len(res)):
+                if i >= 1:
+                    res[i] -= res[i - 1]
+                res[i] += 32 * signal[i + 16] - signal[i + 32] + signal[i]
+            return res
+
+        def compute_derivative(signal):
+            res = np.zeros(len(signal) - 4)
+            for i in range(len(res)):
+                res[i] = (1 / 8) * (-signal[i] - 2 * signal[i + 1] + 2 * signal[i + 3] + signal[i + 4])
+            return res / res.max()
+
+        def squared(signal):
+            return signal * signal
+
+        def moving_window_average(signal, N):
+            res = np.zeros(len(signal) - N)
+            for i in range(len(res)):
+                for j in range(N):
+                    res[i] += signal[i + j]
+            return res / N
+
+        def thresholding(signal, threshold1, threshold2):
+            interval = 0 #interval without QRS peak
+            spki = 0 #QRS peaks level
+            npki = 0 #noise peaks level
+            rr_avg1 = 0
+            rr_avg2 = 0
+            rr_miss = 0
+            for i in range(signal):
+                if(interval >= rr_miss):
+                    for j in range(i - interval, i):
+                        if(signal[j] > threshold2):
+                            5
+
+                else:
+                    peaki = signal[i]
+                    if peaki > threshold1:
+                        spki = 0.125 * peaki + 0.875 * spki
+                    else:
+                        npki = 0.125 * peaki + 0.875 * npki
+                    threshold1 = npki + 0.25(spki - npki)
+                    threshold2 = 0.5 * threshold1
+
+        """def find_intervals(signal, pks):
+            pks = np.insert(pks, 0, 0)
+            pks = np.append(pks, len(signal) - 1)
+            starts = []
+            ends = []
+            for i in range(1, len(pks) - 1):
+                interval = range(int((pks[i - 1] + pks[i]) / 2), int((pks[i] + pks[i + 1]) / 2))
+                trheshold = signal[interval].max() * 0.95
+                flag = False
+                for j in interval:
+                    if not flag and signal[j] > trheshold:
+                        starts.append(j)
+                        flag = True
+                    if flag and signal[j] < trheshold:
+                        ends.append(j)
+                        flag = False
+                        break
+                if flag:
+                    starts.pop(len(starts) - 1)
+            return np.array(starts), np.array(ends)
+
+        def find_peaks(signal):
+            pks, _ = scipy.signal.find_peaks(signal, distance=32)
+            peaki = signal[0]
+            noise_level = 0
+            peak_index = []
+            peak_value = []
+            threshold = signal[pks[0:100]].max() / 2
+            signal_level = threshold
+            for i in range(0, len(pks)):
+                if signal[pks[i]] > threshold:
+                    signal_level = signal[pks[i]]
+                    peak_index.append(pks[i])
+                    peak_value.append(signal[pks[i]])
+                else:
+                    noise_level = signal[pks[i]]
+                signal_level = 0.875 * signal_level + 0.125 * signal[pks[i]]
+                noise_level = 0.875 * noise_level + 0.125 * signal[pks[i]]
+                threshold = noise_level + 0.25 * (signal_level - noise_level)
+            return np.array(peak_index), np.array(peak_value)"""
+
+        i = self.get_pos(None, src, index)
+        x, meta = self.signal[i][0], self.meta[i]
+        fs = meta["fs"]
+        plt.plot(x[100:200])
+        plt.show()
+        x1 = low_freq_filter(x)
+        plt.plot(x1[100:200])
+        plt.show()
+        x2 = high_freq_filter(x1)
+        plt.plot(x2[100:200])
+        plt.show()
+        x3 = compute_derivative(x2)
+        plt.plot(x3[100:200])
+        plt.show()
+        x4 = squared(x3)
+        plt.plot(x4[100:200])
+        plt.show()
+        N = int(0.15 * fs)  # 32 ??
+        x5 = moving_window_average(x4, N)
+        x5 = np.concatenate((np.zeros(39), x5))  # какое смещение ??? 16 + 6 + 4 + N
+        plt.plot(x5[100:200])
+        plt.show()
+
+        p_sig, _ = find_peaks(x5)
+        starts_qrs, ends_qrs = find_intervals(x5, p_sig)
+        # p_sig = peakdet(x, 0.5)[0]
+        p = np.zeros(len(x), np.int64) - 1
+        for i in range(len(starts_qrs)):
+            p[starts_qrs[i]: ends_qrs[i]] = 0
+        # plt.plot(p[100:200])
+        # plt.show()
+        i = self.get_pos(None, src, index)
+        getattr(self, dst)[i] = p
+
+    @bf.action
+    @bf.inbatch_parallel(init="_init_component", target="threads")
     def my_pan_tompkins(self, index, src="signal", dst="qrs_annotation"):
         def low_freq_filter(signal):
             res = np.zeros(len(signal) - 12)
@@ -1656,18 +1887,17 @@ class EcgBatch(bf.Batch):
         x4 = squared(x3)
         #plt.plot(x4[100:200])
         #plt.show()
-        N = 32
+        N = int(0.15 * fs) # 32 ??
         x5 = moving_window_average(x4, N)
-        x5 = np.concatenate((np.zeros(39), x5))
+        x5 = np.concatenate((np.zeros(39), x5)) # какое смещение ??? 16 + 6 + 4 + N
         #plt.plot(x5[100:200])
         #plt.show()
         p_sig, _ = find_peaks(x5)
-        p_sig = p_sig
         starts_qrs, ends_qrs = find_intervals(x5, p_sig)
         # p_sig = peakdet(x, 0.5)[0]
-        p = np.zeros(len(x), np.int64) - 1
+        p = np.zeros(len(x), np.int64)
         for i in range(len(starts_qrs)):
-            p[starts_qrs[i] : ends_qrs[i]] = 0
+            p[starts_qrs[i] : ends_qrs[i]] = 1
         #plt.plot(p[100:200])
         #plt.show()
         i = self.get_pos(None, src, index)
@@ -1676,20 +1906,155 @@ class EcgBatch(bf.Batch):
     @bf.action
     @bf.inbatch_parallel(init="_init_component", src="signal", dst="qrs_annotation", target="threads")
     def hilbert_transform(self, index, src="signal", dst="qrs_annotation"):
+        # TODO: this code is not working right...
+        def derivative(signal):
+            res = np.zeros(len(signal) - 2)
+            for i in range(len(res)):
+                res[i] = (signal[i] + signal[i + 2]) / 2
+            return res
+        def moving_window_average(signal, N):
+            res = np.zeros(len(signal) - N)
+            for i in range(len(res)):
+                for j in range(N):
+                    res[i] += signal[i + j]
+            return res / N
+        def find_intervals(signal, pks):
+            pks = np.insert(pks, 0, 0)
+            pks = np.append(pks, len(signal) - 1)
+            starts = []
+            ends = []
+            for i in range(1, len(pks) - 1):
+                interval = range(int((pks[i - 1] + pks[i]) / 2), int((pks[i] + pks[i+1]) / 2))
+                trheshold = np.average(signal[interval])
+                flag = False
+                for j in interval:
+                    if not flag and signal[j] > trheshold:
+                        starts.append(j)
+                        flag = True
+                    if flag and signal[j] < trheshold:
+                        ends.append(j)
+                        flag = False
+                        break
+                if flag:
+                    starts.pop(len(starts) - 1)
+            return np.array(starts), np.array(ends)
+
+        def panPeakDetect(detection, fs):
+            min_distance = int(0.25 * fs)
+
+            signal_peaks = [0]
+            noise_peaks = []
+
+            SPKI = 0.0
+            NPKI = 0.0
+
+            threshold_I1 = 0.0
+            threshold_I2 = 0.0
+
+            RR_missed = 0
+            index = 0
+            indexes = []
+
+            missed_peaks = []
+            peaks = []
+
+            for i in range(len(detection)):
+
+                if i > 0 and i < len(detection) - 1:
+                    if detection[i - 1] < detection[i] and detection[i + 1] < detection[i]:
+                        peak = i
+                        peaks.append(i)
+
+                        if detection[peak] > threshold_I1 and (peak - signal_peaks[-1]) > 0.3 * fs:
+
+                            signal_peaks.append(peak)
+                            indexes.append(index)
+                            SPKI = 0.125 * detection[signal_peaks[-1]] + 0.875 * SPKI
+                            if RR_missed != 0:
+                                if signal_peaks[-1] - signal_peaks[-2] > RR_missed:
+                                    missed_section_peaks = peaks[indexes[-2] + 1:indexes[-1]]
+                                    missed_section_peaks2 = []
+                                    for missed_peak in missed_section_peaks:
+                                        if missed_peak - signal_peaks[-2] > min_distance and signal_peaks[
+                                            -1] - missed_peak > min_distance and detection[missed_peak] > threshold_I2:
+                                            missed_section_peaks2.append(missed_peak)
+
+                                    if len(missed_section_peaks2) > 0:
+                                        missed_peak = missed_section_peaks2[np.argmax(detection[missed_section_peaks2])]
+                                        missed_peaks.append(missed_peak)
+                                        signal_peaks.append(signal_peaks[-1])
+                                        signal_peaks[-2] = missed_peak
+
+                        else:
+                            noise_peaks.append(peak)
+                            NPKI = 0.125 * detection[noise_peaks[-1]] + 0.875 * NPKI
+
+                        threshold_I1 = NPKI + 0.25 * (SPKI - NPKI)
+                        threshold_I2 = 0.5 * threshold_I1
+
+                        if len(signal_peaks) > 8:
+                            RR = np.diff(signal_peaks[-9:])
+                            RR_ave = int(np.mean(RR))
+                            RR_missed = int(1.66 * RR_ave)
+
+                        index = index + 1
+
+            signal_peaks.pop(0)
+
+            return signal_peaks
+
+        def find_peaks(signal, fs):
+            pks, _ = scipy.signal.find_peaks(signal, distance=int(0.25*fs))
+            peaki = signal[0]
+            noise_level = 0
+            peak_index = []
+            peak_value = []
+            threshold = signal[pks[0:100]].max()/2
+            signal_level = threshold
+            for i in range(0, len(pks)):
+                if signal[pks[i]] > threshold:
+                    signal_level = signal[pks[i]]
+                    peak_index.append(pks[i])
+                    peak_value.append(signal[pks[i]])
+                else:
+                    noise_level = signal[pks[i]]
+                signal_level = 0.875 * signal_level + 0.125 * signal[pks[i]]
+                noise_level = 0.875 * noise_level + 0.125 * signal[pks[i]]
+                threshold = noise_level + 0.25 * (signal_level - noise_level)
+            return np.array(peak_index), np.array(peak_value)
+
         i = self.get_pos(None, src, index)
         x, meta = self.signal[i][0], self.meta[i]
-
-        plt.plot(x[0:1000])
-        plt.show()
         fs = meta["fs"]
-        x1 = scipy.signal.hilbert(x)
-        plt.plot(x1[0:1000])
-        plt.show()
-        x1 = abs(x1)
-        x1 = x1 / x1.max()
-        plt.plot(x1[0:1000])
-        plt.show()
-        x2 = x1 * x1
-        plt.plot(x1[0:1000])
-        plt.show()
+        #plt.plot(x[0:1000])
+        #plt.show()
+        x1 = derivative(x)
+        #plt.plot(x1[0:1000])
+        #plt.show()
+        x2 = scipy.fftpack.hilbert(x1)
+        #plt.plot(x2[0:1000])
+        #plt.show()
+        x3 = abs(x2)
+        x4 = x3 / x3.max()
+        #plt.plot(x4[0:1000])
+        #plt.show()
+        x5 = x4 * x4
+        #plt.plot(x5[0:1000])
+        #plt.show()
+        N = int(0.15 * fs) # 32 ??
+        x6 = moving_window_average(x5, N)
+        #plt.plot(x6[0:1000])
+        #plt.show()
+        ###p_sig, _ = find_peaks(x6)
+        p_sig = panPeakDetect(x6, fs)
+        starts_qrs, ends_qrs = find_intervals(x6, p_sig)
+        # p_sig = peakdet(x, 0.5)[0]
+        p = np.zeros(len(x), np.int64)
+        for i in range(len(starts_qrs)):
+            p[starts_qrs[i] : ends_qrs[i]] = 1
+        #plt.plot(p[0:1000])
+        #plt.show()
+        i = self.get_pos(None, src, index)
+        getattr(self, dst)[i] = p
+        #thresholding
 

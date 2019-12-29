@@ -5,73 +5,198 @@ QRS_model_12 is trained for 4509.244914054871 s
 QRS_model_9_ST is trained for 2748.246190547943 s
 QRS_model_9_T is trained for 2754.3985426425934 s
 
-QRS_model_6.dill    sensitivity= 0.9156202913108991	specificity= 0.5884061713252856
-QRS_model_16.dill   sensitivity= 0.9927674535409342	specificity= 0.8918065331167659
-QRS_model_18.dill   sensitivity= 0.9924660974384731	specificity= 0.98225381518119
-Pan-Tompkins	    sensitivity= 0.9658061785865425	specificity= 0.918908036720889
-
-QRS_model_6.dill	sensitivity= 0.8417378201908589	specificity= 0.8326625925373876
-QRS_model_16.dill	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
-QRS_model_18.dill	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
-Pan-Tompkins	    sensitivity= 0.8545956805625314	specificity= 0.8427439326399208
 
 
-QRS_model_6	    sensitivity= 0.8417378201908589	specificity= 0.8326625925373876
-QRS_model_16	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
-QRS_model_18	sensitivity= 0.9924660974384731	specificity= 0.98225381518119
-Pan-Tompkins	sensitivity= 0.8545956805625314	specificity= 0.8427439326399208
 
+------------------------------------------------------
+QRS	QRS_model_6	sensitivity	0.5762844305528424
+QRS_model_6	tp	5900
+QRS_model_6	fn	4338
+QRS_model_6	fp	8846
 
-QRS_model_6 	sensitivity= 0.691863385233551	specificity= 0.6844040343816764
-QRS_model_16 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
-QRS_model_18 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
-Pan-Tompkins	sensitivity= 0.8410346559517831	specificity= 0.8400642151206542
+ST	QRS_model_6	sensitivity	0.3966595038093378
+QRS_model_6	tp	4061
+QRS_model_6	fn	6177
+QRS_model_6	fp	10690
 
+T	QRS_model_6	sensitivity	0.30895260386190754
+QRS_model_6	tp	3168
+QRS_model_6	fn	7086
+QRS_model_6	fp	11583
 
-QRS_model_6 	sensitivity= 0.691863385233551	specificity= 0.6844040343816764
-QRS_model_16 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
-QRS_model_18 	sensitivity= 0.9758915118031141	specificity= 0.9658497787940548
-Pan-Tompkins	sensitivity= 0.8516825715720744	specificity= 0.850870590596618
+ISO	QRS_model_6	sensitivity	0.2169074580242093
+QRS_model_6	tp	2222
+QRS_model_6	fn	8022
+QRS_model_6	fp	12529
 
-********************************************************************************
-New models trained and tested on different dataset
-QRS test
-QRS_model_6 	    sensitivity= 0.985  specificity= 0.684
-QRS_model_9 	    sensitivity= 0.969  specificity= 0.846
-QRS_model_16 	    sensitivity= 0.978	specificity= 0.972
-QRS_model_18 	    sensitivity= 0.985	specificity= 0.979
-Pan-Tompkins	    sensitivity= 0.810	specificity= 0.811
-Hilbert-transform	sensitivity= 0.638	specificity= 0.629
+P	QRS_model_6	sensitivity	0.5808255221180727
+QRS_model_6	tp	3532
+QRS_model_6	fn	2549
+QRS_model_6	fp	7265
 
-ST
-QRS_model_6 	    sensitivity= 0.791  specificity= 0.549
-QRS_model_9 	    sensitivity= 0.824  specificity= 0.719
-QRS_model_16 	    sensitivity= 0.893	specificity= 0.887
-QRS_model_18 	    sensitivity= 0.844	specificity= 0.838
+PQ	QRS_model_6	sensitivity	0.82223318533136
+QRS_model_6	tp	5000
+QRS_model_6	fn	1081
+QRS_model_6	fp	9754
 
-T
-QRS_model_6 	    sensitivity= 0.588  specificity= 0.409
-QRS_model_9 	    sensitivity= 0.637  specificity= 0.557
-QRS_model_16 	    sensitivity= 0.718	specificity= 0.714
-QRS_model_18 	    sensitivity= 0.716	specificity= 0.712
+All sensitivity 0.44946928635953026
+QRS	QRS_model_8	sensitivity	0.5413166634108224
+QRS_model_8	tp	5542
+QRS_model_8	fn	4696
+QRS_model_8	fp	6175
 
-ISO
-QRS_model_6 	    sensitivity= 0.442  specificity= 0.307
-QRS_model_9 	    sensitivity= 0.490  specificity= 0.428
-QRS_model_16 	    sensitivity= 0.533	specificity= 0.530
-QRS_model_18 	    sensitivity= 0.543	specificity= 0.540
+ST	QRS_model_8	sensitivity	0.3410822426255128
+QRS_model_8	tp	3492
+QRS_model_8	fn	6746
+QRS_model_8	fp	8232
 
-P
-QRS_model_6 	    sensitivity= 0.930  specificity= 0.524
-QRS_model_9 	    sensitivity= 0.938  specificity= 0.559
-QRS_model_16 	    sensitivity= 0.956	specificity= 0.585
-QRS_model_18 	    sensitivity= 0.954	specificity= 0.596
+T	QRS_model_8	sensitivity	0.2672127950068266
+QRS_model_8	tp	2740
+QRS_model_8	fn	7514
+QRS_model_8	fp	8984
 
-PQ TEST
-QRS_model_6 	    sensitivity= 0.977  specificity= 0.402
-QRS_model_9 	    sensitivity= 0.984  specificity= 0.510
-QRS_model_16 	    sensitivity= 0.970	specificity= 0.572
-QRS_model_18 	    sensitivity= 0.974	specificity= 0.574
+ISO	QRS_model_8	sensitivity	0.1621436938695822
+QRS_model_8	tp	1661
+QRS_model_8	fn	8583
+QRS_model_8	fp	10063
+
+P	QRS_model_8	sensitivity	0.5451406018746917
+QRS_model_8	tp	3315
+QRS_model_8	fn	2766
+QRS_model_8	fp	6887
+
+PQ	QRS_model_8	sensitivity	0.9151455352738036
+QRS_model_8	tp	5565
+QRS_model_8	fn	516
+QRS_model_8	fp	6161
+
+All sensitivity 0.41996010237880155
+QRS	QRS_model_11	sensitivity	0.7449697206485641
+QRS_model_11	tp	7627
+QRS_model_11	fn	2611
+QRS_model_11	fp	2829
+
+ST	QRS_model_11	sensitivity	0.2650908380543075
+QRS_model_11	tp	2714
+QRS_model_11	fn	7524
+QRS_model_11	fp	7749
+
+T	QRS_model_11	sensitivity	0.1525258435732397
+QRS_model_11	tp	1564
+QRS_model_11	fn	8690
+QRS_model_11	fp	8899
+
+ISO	QRS_model_11	sensitivity	0.13861772745021475
+QRS_model_11	tp	1420
+QRS_model_11	fn	8824
+QRS_model_11	fp	9043
+
+P	QRS_model_11	sensitivity	0.3305377405032067
+QRS_model_11	tp	2010
+QRS_model_11	fn	4071
+QRS_model_11	fp	8183
+
+PQ	QRS_model_11	sensitivity	0.7714191744778819
+QRS_model_11	tp	4691
+QRS_model_11	fn	1390
+QRS_model_11	fp	5774
+
+All sensitivity 0.3768819632640771
+QRS	QRS_model_16	sensitivity	0.7269974604414925
+QRS_model_16	tp	7443
+QRS_model_16	fn	2795
+QRS_model_16	fp	2857
+
+ST	QRS_model_16	sensitivity	0.48886501269779253
+QRS_model_16	tp	5005
+QRS_model_16	fn	5233
+QRS_model_16	fp	5301
+
+T	QRS_model_16	sensitivity	0.3820947922761849
+QRS_model_16	tp	3918
+QRS_model_16	fn	6336
+QRS_model_16	fp	6388
+
+ISO	QRS_model_16	sensitivity	0.2894377196407653
+QRS_model_16	tp	2965
+QRS_model_16	fn	7279
+QRS_model_16	fp	7342
+
+P	QRS_model_16	sensitivity	0.7781614865975991
+QRS_model_16	tp	4732
+QRS_model_16	fn	1349
+QRS_model_16	fp	5197
+
+PQ	QRS_model_16	sensitivity	0.7972372964972866
+QRS_model_16	tp	4848
+QRS_model_16	fn	1233
+QRS_model_16	fp	5460
+
+All sensitivity 0.5440943992773261
+QRS	QRS_model_19	sensitivity	0.8451846063684313
+QRS_model_19	tp	8653
+QRS_model_19	fn	1585
+QRS_model_19	fp	1646
+
+ST	QRS_model_19	sensitivity	0.2838445008790779
+QRS_model_19	tp	2906
+QRS_model_19	fn	7332
+QRS_model_19	fp	7398
+
+T	QRS_model_19	sensitivity	0.15710942071386777
+QRS_model_19	tp	1611
+QRS_model_19	fn	8643
+QRS_model_19	fp	8693
+
+ISO	QRS_model_19	sensitivity	0.2521475985942991
+QRS_model_19	tp	2583
+QRS_model_19	fn	7661
+QRS_model_19	fp	7722
+
+P	QRS_model_19	sensitivity	0.7355698075974346
+QRS_model_19	tp	4473
+QRS_model_19	fn	1608
+QRS_model_19	fp	5250
+
+PQ	QRS_model_19	sensitivity	0.8179575727676369
+QRS_model_19	tp	4974
+QRS_model_19	fn	1107
+QRS_model_19	fp	5333
+
+All sensitivity 0.4742547425474255
+QRS	QRS_model_23	sensitivity	0.829849579996093
+QRS_model_23	tp	8496
+QRS_model_23	fn	1742
+QRS_model_23	fp	1786
+
+ST	QRS_model_23	sensitivity	0.28872826723969525
+QRS_model_23	tp	2956
+QRS_model_23	fn	7282
+QRS_model_23	fp	7331
+
+T	QRS_model_23	sensitivity	0.17836941681295104
+QRS_model_23	tp	1829
+QRS_model_23	fn	8425
+QRS_model_23	fp	8458
+
+ISO	QRS_model_23	sensitivity	0.37358453729012103
+QRS_model_23	tp	3827
+QRS_model_23	fn	6417
+QRS_model_23	fp	6461
+
+P	QRS_model_23	sensitivity	0.6513731294195033
+QRS_model_23	tp	3961
+QRS_model_23	fn	2120
+QRS_model_23	fp	4775
+
+PQ	QRS_model_23	sensitivity	0.7033382667324454
+QRS_model_23	tp	4277
+QRS_model_23	fn	1804
+QRS_model_23	fp	6012
+
+All sensitivity 0.477002408912978
+
+Process finished with exit code 0
 
 ---------------------------------------------------------------------------------------------------
 QRS
