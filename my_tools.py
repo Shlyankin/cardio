@@ -3,8 +3,36 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 from cardio import EcgBatch
 
+def calc_metr_qrs(batch, annot, type='micro'):
+    def transform(annotation):
+        indexes = annotation == 0
+        annotation[annotation != 0] = 0
+        annotation[indexes] = 1
 
-def calc_precision(batch, annot, states, type='micro'):
+    """    average : string, [None, 'binary' (default), 'micro', 'macro', 'samples', 'weighted']"""
+    metr = {"accuracy": 0,
+            "precision": 0,
+            "recall": 0,
+            "f-score": 0}
+    seq_pred = np.array([], dtype=np.int32)
+    seq_true = np.array([], dtype=np.int32)
+    for i in range(len(batch.annotation)):
+        anntype = batch.annotation[i]["anntype"]
+        annsamp = batch.annotation[i]["annsamp"]
+        expanded = expand_annotation(annsamp, anntype, len(batch.signal[i][0]))
+        expanded = expanded.astype(np.int32)
+        transform(expanded)
+        seq_true = np.concatenate((seq_true, expanded))
+        annotation = batch.get(component=annot)[i]
+        seq_pred = np.concatenate((seq_pred, annotation))
+    metr["precision"] = metrics.precision_score(y_pred=seq_pred, y_true=seq_true, average=type)
+    metr["recall"] = metrics.recall_score(y_pred=seq_pred, y_true=seq_true, average=type)
+    metr["f-score"] = metrics.f1_score(y_pred=seq_pred, y_true=seq_true, average=type)
+    metr["accuracy"] = metrics.accuracy_score(y_pred=seq_pred, y_true=seq_true)
+    return metr
+
+
+def calc_metr(batch, annot, states, type='micro'):
     """    average : string, [None, 'binary' (default), 'micro', 'macro', 'samples', 'weighted']"""
     metr = {"accuracy": 0,
             "precision": 0,
@@ -137,7 +165,7 @@ def calculate_metrics(batch, states, state_num, annot):
             "tn": parameters["tn"]}
 
 
-def calculate_old_metrics(batch, states, state_num, annot):
+def calculate_old_metrics(batch, annot, states, state_num):
     def tp_fn_fp(true_annot, annot, states, state_num, error):
         true_intervals = find_intervals_borders(true_annot, np.array(list(range(state_num if state_num != 0 else 0,
                                                                                 state_num + 1)), np.int64))
@@ -167,7 +195,6 @@ def calculate_old_metrics(batch, states, state_num, annot):
         parameters["fn"] += new_parameters["fn"]
         parameters["fp"] += new_parameters["fp"]
     return {"sensitivity": float(parameters["tp"]) / (parameters["tp"] + parameters["fn"]),
-            "specificity": float(parameters["tp"]) / (parameters["tp"] + parameters["fp"]),
             "tp": parameters["tp"],
             "fn": parameters["fn"],
             "fp": parameters["fp"]}

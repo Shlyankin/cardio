@@ -3,7 +3,7 @@ import hmmlearn.hmm as hmm
 
 from functools import partial
 
-from cardio.batchflow import V, F
+from cardio.batchflow import V, F, B
 from cardio.batchflow.batchflow.models import tf
 from cardio.models import DirichletModel, concatenate_ecg_batch
 from cardio.models.hmm import HMModel, prepare_hmm_input
@@ -164,6 +164,18 @@ def PanTompkinsPipeline(batch_size=20, annot = "pan_tomp_annotation"):
             .init_variable(annot, init_on_each_run=list)
             .my_pan_tompkins(dst=annot)
             .update_variable(annot, bf.B(annot), mode='e'))
+
+from lstm_main_train import MyLSTM
+def LSTM_train_pipeline(model_name="lstm"):
+    model_config = {
+
+    }
+
+    return (bf.Pipeline()
+            .init_model("dynamic", MyLSTM, name=model_name, config=model_config)
+            .load(fmt='wfdb', components=["signal", "annotation", "meta"], ann_ext='pu1')
+            .train_model(model_name, x=B('signal'), y_true=B('annot'))
+            )
 
 def dirichlet_train_pipeline(labels_path, batch_size=256, n_epochs=1000, gpu_options=None,
                              loss_history='loss_history', model_name='dirichlet'):
