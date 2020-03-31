@@ -50,7 +50,10 @@ def get_ecg_data(datfile):
 
     Vctrecord = np.transpose(record[0])
     VctAnnotationHot = np.zeros((6, len(Vctrecord[1])), dtype=np.int)
-    VctAnnotationHot[5] = 1  ## inverse of the others
+    # TODO: default annotation:
+    #VctAnnotationHot[5] = 1  ## inverse of the others
+    # TODO: my annotation:
+    VctAnnotationHot[3] = 1
     # print("ecg, 2 lead of shape" , Vctrecord.shape)
     # print("VctAnnotationHot of shape" , VctAnnotationHot.shape)
     # print('plotting extracted signal with annotation')
@@ -78,15 +81,40 @@ def get_ecg_data(datfile):
                             tpos = VctAnnotations[i + ii][0]
                             if VctAnnotations[i + ii + 1][1] == ")":
                                 tendpos = VctAnnotations[i + ii + 1][0]
-                                # 				#print(ppos,qpos,rpos,spos,tendpos)
-                                VctAnnotationHot[0][pstart:pend] = 1  # P segment
-                                VctAnnotationHot[1][
-                                pend:qpos] = 1  # part "nothing" between P and Q, previously left unnanotated, but categorical probably can't deal with that
-                                VctAnnotationHot[2][qpos:rpos] = 1  # QR
-                                VctAnnotationHot[3][rpos:spos] = 1  # RS
-                                VctAnnotationHot[4][spos:tendpos] = 1  # ST (from end of S to end of T)
-                                VctAnnotationHot[5][
-                                pstart:tendpos] = 0  # tendpos:pstart becomes 1, because it is inverted above
+                                # print(ppos,qpos,rpos,spos,tendpos)
+
+                                # TODO: default annotation:
+                                """{'N': 0, 'st': 1, 't': 2, 'iso': 3, 'p': 4, 'pq': 5}
+                                # P segment
+                                VctAnnotationHot[0][pstart:pend] = 1
+                                # part "nothing" between P and Q, previously left unnanotated, but categorical probably can't deal with that
+                                VctAnnotationHot[1][pend:qpos] = 1
+                                # QR
+                                VctAnnotationHot[2][qpos:rpos] = 1
+                                # RS
+                                VctAnnotationHot[3][rpos:spos] = 1
+                                # ST (from end of S to end of T)
+                                VctAnnotationHot[4][spos:tendpos] = 1
+                                # tendpos:pstart becomes 1, because it is inverted above
+                                VctAnnotationHot[5][pstart:tendpos] = 0
+                                #"""
+                                # TODO: my annotation:
+                                #"""{'N': 0, 'st': 1, 't': 2, 'iso': 3, 'p': 4, 'pq': 5}
+                                # QRS segment
+                                VctAnnotationHot[0][qpos:spos] = 1
+                                # ST segment
+                                VctAnnotationHot[1][spos:tpos] = 1
+                                # T
+                                VctAnnotationHot[2][tpos:tendpos] = 1
+                                # ISO
+                                VctAnnotationHot[3][pstart:tendpos] = 0
+                                # P
+                                VctAnnotationHot[4][pstart:pend] = 1
+                                # PQ
+                                VctAnnotationHot[5][pend:qpos] = 1
+                                #"""
+
+
         except IndexError:
             pass
 
@@ -312,13 +340,15 @@ print("xxv/validation shape: {}, Seqlength: {}, Features: {}".format(xxv.shape[0
 
 # call keras/tensorflow and build lstm model 
 KTF.set_session(get_session())
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
-    if not os.path.isfile('model.h5'):
+    if not os.path.isfile('model_40.h5'):
         model = getmodel()  # build model
-        model.fit(xxt, yyt, batch_size=32, epochs=100, verbose=1)  # train the model
-        model.save('model.h5')
+        model.fit(xxt, yyt, batch_size=128, epochs=40, verbose=1)  # train the model
+        model.save('model_40.h5')
 
-    model = load_model('model.h5')
+    model = load_model('model_40.h5')
     score, acc = model.evaluate(xxv, yyv, batch_size=4, verbose=1)
     print('Test score: {} , Test accuracy: {}'.format(score, acc))
 
