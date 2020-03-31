@@ -141,13 +141,13 @@ def plot_pp_lab1():
 
 def plot_pp_lab2():
     times = {
-        "MPI point-to-point":   [0.000494, 0.000949],
-        "MPI collective op":    [0.000505, 0.000959],
-        "OpenMP critical":      [1.624782, 1.256059],
-        "OpenMP atomic":        [0.682222, 0.398773],
-        "OpenMP reduce":        [0.004565, 0.008743]
+        "MPI collective op":    [0.000484,	0.000267,	0.000185],
+        "MPI point-to-point":   [0.000486,	0.000260,	0.000190],
+        "OpenMP atomic":        [0.511643,	0.667803,	1.045829],
+        "OpenMP critical":      [1.141544,	1.186841,	1.152581],
+        "OpenMP reduce":        [0.004501,	0.002395,	0.002769]
     }
-    nodes = [2, 4]
+    nodes = [3, 6, 12]
 
     ax1: plt.Axes
     _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
@@ -162,7 +162,7 @@ def plot_pp_lab2():
     ax1.grid(which='major', color='k')
     ax1.minorticks_on()
     ax1.grid(which='minor', color='gray',linestyle=':')
-    ax1.set_ylim(ymin=0, ymax=1.8)
+    ax1.set_ylim(ymin=0, ymax=1.2)
     ax1.set_xlim(xmin=nodes[0], xmax=nodes[-1])
     ax1.set_title("Параллельные алгоритмы поиска суммы элементов массива")
     ax1.set_xlabel("Количество нитей, шт")
@@ -174,42 +174,36 @@ def plot_pp_lab2():
 
 def plot_pp_lab3():
     """
-times = {
-        "MPI кратно":          [0.000884,   0.008392,   0.030042],
-        "MPI не кратно":       [0.000879,   0.008379,   0.030013],
-        "OpenMP Static":       [0.000364,   0.000589,   0.001192],
-        "OpenMP Guided":       [0.000103,   0.000403,   0.000783],
-        "OpenMP Dynamic":      [0.000479,   0.001624,	0.003175],
-    }
 
-times = {
-    "MPI кратно":          [0.001012, 0.009576, 0.034068],
-    "MPI не кратно":       [0.000980, 0.009416, 0.033776],
-    "OpenMP Static":       [0.000406, 0.000327, 0.000629],
-    "OpenMP Guided":       [0.000083, 0.000309, 0.000625],
-    "OpenMP Dynamic":      [0.000403, 0.001083, 0.002171],
-}
-0.000936, 0.008803, 0.035320
-0.007908, 0.035017, 0.056273
-0.001571, 0.000313, 0.000613
-0.000833, 0.000949, 0.000621
-0.001290, 0.000310, 0.001898
+[0.001238, 0.007076, 0.017445]
+[0.001185, 0.006930, 0.017244]
+[0.000758, 0.000841, 0.001288]
+[0.000264, 0.000654, 0.001136]
+[0.000602, 0.001314, 0.002195]
+
+[0.001525, 0.007601, 0.018301]
+[0.001241, 0.007046, 0.017465]
+[0.006661, 0.000647, 0.001050]
+[0.004289, 0.000496, 0.000820]
+[0.006336, 0.000868, 0.001447]
+
+
 """
     times = {
-        "MPI кратно":          [0.000936, 0.008803, 0.035320],
-        "MPI не кратно":       [0.007908, 0.035017, 0.056273],
-        "OpenMP Static":       [0.001571, 0.000313, 0.000613],
-        "OpenMP Guided":       [0.000833, 0.000949, 0.000621],
-        "OpenMP Dynamic":      [0.001290, 0.000310, 0.001898],
+        "MPI кратно":          [0.001525, 0.007601, 0.018301],
+        "MPI не кратно":       [0.001241, 0.007046, 0.017465],
+        "OpenMP Static":       [0.006661, 0.000647, 0.001050],
+        "OpenMP Guided":       [0.004289, 0.000496, 0.000820],
+        "OpenMP Dynamic":      [0.006336, 0.000868, 0.001447],
     }
-    nodes = [1, 4, 8]
+    nodes = [1, 3, 5]
 
     ax1: plt.Axes
     _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
     for item in times.keys():
         ax1.plot(nodes, times[item], label=item)
     ax1.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), shadow=True, ncol=2)
-    ax1.xaxis.set_major_locator(ticker.MultipleLocator(4))
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(5))
     ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
     ax1.yaxis.set_major_locator(ticker.MultipleLocator(0.01))
     ax1.yaxis.set_minor_locator(ticker.MultipleLocator(0.001))
@@ -237,18 +231,15 @@ def plot_pp_lab4():
 
 """
     times = {
-        "Block = 1024":         [0.000909536],
-        "Block = 512":          [0.000863872],
-        "Block = 256":          [0.000859136],
-        "Block = 128":          [0.000866720],
-        "Block = 64":           [0.000920096],
-        "MPI 16 потоков":       [0.010472],
-        "OpenMP 16 потоков":    [0.005470]
+        "Block = 512, 450 000 эл.":         [0.001181888],
+        "Block = 256, 450 000 эл.":         [0.001197120],
+        "Block = 512, 900 000 эл.":         [0.002302080],
+        "Block = 256, 900 000 эл.":         [0.002325952],
     }
     block_size = [1024, 512, 256, 128, 64]
 
     ax1: plt.Axes
-    _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(16, 18))
+    _, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
     for item in times.keys():
         ax1.bar(item, times[item], width=0.8, label=item)
         #ax1.plot(block_size, times[item], label=item)
@@ -309,8 +300,8 @@ def plot_pp_lab5():
     plt.show()
 #plot_pp_lab5()
 #plot_pp_lab4()
-plot_pp_lab3()
+#plot_pp_lab3()
 #plot_pp_lab2()
 #plot_pp_lab1()
-#plot_time()
-#plot_metrics()
+plot_time()
+plot_metrics()

@@ -26,6 +26,80 @@ np.random.seed(0)
 
 annot_type = "pu1"
 
+
+def my_get_ecg_data(datfile):
+    ## convert .dat/q1c to numpy arrays
+    recordname = os.path.basename(datfile).split(".dat")[0]
+    recordpath = os.path.dirname(datfile)
+    cwd = os.getcwd()
+    os.chdir(recordpath)  ## somehow it only works if you chdir.
+
+    annotator = annot_type
+    annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None)  # read annotation
+    Lstannot = list(zip(annotation.sample, annotation.symbol, annotation.aux_note))
+
+    FirstLstannot = min(i[0] for i in Lstannot)  # annot start
+    LastLstannot = max(i[0] for i in Lstannot) - 1  # annot end
+    print("first-last annotation:", FirstLstannot, LastLstannot)
+
+    record = wfdb.rdsamp(recordname, sampfrom=FirstLstannot, sampto=LastLstannot)  # read signal
+    annotation = wfdb.rdann(recordname, annotator, sampfrom=FirstLstannot,
+                            sampto=LastLstannot)  ## get annotation between first and last.
+    # this make annotation from 0 to end
+    annotation2 = wfdb.Annotation(record_name=recordname, extension=annot_type,
+                                  sample=(annotation.sample - FirstLstannot),
+                                  symbol=annotation.symbol, aux_note=annotation.aux_note)
+
+    Vctrecord = np.transpose(record[0])
+    VctAnnotationHot = np.zeros((6, len(Vctrecord[1])),
+                                dtype=np.int)  # 6 annotation type: 0: P, 1: PQ, 2: QR, 3: RS, 4: ST, 5: ISO (TP)
+    VctAnnotationHot[3] = 1  ## inverse of the others
+    # print("ecg, 2 lead of shape" , Vctrecord.shape)
+    # print("VctAnnotationHot of shape" , VctAnnotationHot.shape)
+    # print('plotting extracted signal with annotation')
+    # wfdb.plotrec(record, annotation=annotation2, title='Record 100 from MIT-BIH Arrhythmia Database', timeunits = 'seconds')
+
+    VctAnnotations = list(zip(annotation2.sample, annotation2.symbol))  ## zip coordinates + annotations (N),(t) etc)
+    # print(VctAnnotations)
+    for i in range(len(VctAnnotations)):
+        # print(VctAnnotations[i]) # Print to display annotations of an ecg
+        try:
+
+            if VctAnnotations[i][1] == "p":
+                if VctAnnotations[i - 1][1] == "(":
+                    pstart = VctAnnotations[i - 1][0]
+                if VctAnnotations[i + 1][1] == ")":
+                    pend = VctAnnotations[i + 1][0]
+                if VctAnnotations[i + 3][1] == "N":
+                    rpos = VctAnnotations[i + 3][0]
+                    if VctAnnotations[i + 2][1] == "(":
+                        qpos = VctAnnotations[i + 2][0]
+                    if VctAnnotations[i + 4][1] == ")":
+                        spos = VctAnnotations[i + 4][0]
+                    for ii in range(0, 8):  ## search for t (sometimes the "(" for the t  is missing  )
+                        if VctAnnotations[i + ii][1] == "t":
+                            if VctAnnotations[i + ii - 1][1] == "(":
+                                tstart = VctAnnotations[i + ii - 1][0]
+                            else:
+                                tstart = VctAnnotations[i + ii][0]
+                            if VctAnnotations[i + ii + 1] == ")":
+                                tend = VctAnnotations[i + ii + 1][0]
+
+                                VctAnnotationHot[0][qpos:spos] = 1  # QRS
+                                VctAnnotationHot[1][spos:tstart] = 1  # ST
+                                VctAnnotationHot[2][tstart:tend] = 1  # T
+                                VctAnnotationHot[3][tend:pstart] = 1  # ISO
+                                VctAnnotationHot[4][pstart:pend] = 1  # P
+                                VctAnnotationHot[5][pend:qpos] = 1  # PQ
+
+        except IndexError:
+            pass
+
+    Vctrecord = np.transpose(Vctrecord)  # transpose to (timesteps,feat)
+    VctAnnotationHot = np.transpose(VctAnnotationHot)
+    os.chdir(cwd)
+    return Vctrecord, VctAnnotationHot
+
 # functions
 def get_ecg_data(datfile):
     ## convert .dat/q1c to numpy arrays
@@ -35,16 +109,17 @@ def get_ecg_data(datfile):
     os.chdir(recordpath)  ## somehow it only works if you chdir.
 
     annotator = annot_type
-    annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None)
+    annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None) #read annotation
     Lstannot = list(zip(annotation.sample, annotation.symbol, annotation.aux_note))
 
-    FirstLstannot = min(i[0] for i in Lstannot)
-    LastLstannot = max(i[0] for i in Lstannot) - 1
+    FirstLstannot = min(i[0] for i in Lstannot) # annot start
+    LastLstannot = max(i[0] for i in Lstannot) - 1 # annot end
     print("first-last annotation:", FirstLstannot, LastLstannot)
 
-    record = wfdb.rdsamp(recordname, sampfrom=FirstLstannot, sampto=LastLstannot)  # wfdb.showanncodes()
+    record = wfdb.rdsamp(recordname, sampfrom=FirstLstannot, sampto=LastLstannot)  # read signal
     annotation = wfdb.rdann(recordname, annotator, sampfrom=FirstLstannot,
                             sampto=LastLstannot)  ## get annotation between first and last.
+    # this make annotation from 0 to end
     annotation2 = wfdb.Annotation(record_name=recordname, extension=annot_type, sample=(annotation.sample - FirstLstannot),
                                   symbol=annotation.symbol, aux_note=annotation.aux_note)
 
@@ -123,7 +198,7 @@ def get_ecg_data(datfile):
     os.chdir(cwd)
     return Vctrecord, VctAnnotationHot
 
-
+# разделияет последовательность x на участки длинной и с перекрытием в o с соседом слева и справа
 def splitseq(x, n, o):
     # split seq; should be optimized so that remove_seq_gaps is not needed.
     upper = math.ceil(x.shape[0] / n) * n
@@ -159,7 +234,6 @@ def remove_seq_gaps(x, y):
     print("filterering.")
     print("before shape x,y", x.shape, y.shape)
     for i in range(y.shape[0]):
-
         c = c + 1
         if c < window:
             include.append(i)
@@ -183,73 +257,15 @@ def normalizesignal_array(x):
         x[i] = st.zscore(x[i], axis=0, ddof=0)
     return x
 
-
-def plotecg(x, y, begin, end):
-    # helper to plot ecg
-    plt.figure(1, figsize=(11.69, 8.27))
-    plt.subplot(211)
-    plt.plot(x[begin:end, 0])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 0])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 1])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 2])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 3])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 4])
-    plt.subplot(211)
-    plt.plot(y[begin:end, 5])
-
-    plt.subplot(212)
-    plt.plot(x[begin:end, 1])
-    plt.show()
-
-
-def plotecg_validation(x, y_true, y_pred, begin, end):
-    # helper to plot ecg
-    plt.figure(1, figsize=(11.69, 8.27))
-    plt.subplot(211)
-    plt.plot(x[begin:end, 0])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 0])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 1])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 2])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 3])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 4])
-    plt.subplot(211)
-    plt.plot(y_pred[begin:end, 5])
-
-    plt.subplot(212)
-    plt.plot(x[begin:end, 1])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 0])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 1])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 2])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 3])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 4])
-    plt.subplot(212)
-    plt.plot(y_true[begin:end, 5])
-
-
 def LoaddDatFiles(datfiles):
     for datfile in datfiles:
         print(datfile)
-        if basename(datfile).split(".", 1)[0] in exclude:
+        if basename(datfile).split(".", 1)[0] in exclude: # continue exlude files
             continue
-        qf = os.path.splitext(datfile)[0] + '.' + annot_type
+        qf = os.path.splitext(datfile)[0] + '.' + annot_type # set annot filename
         if os.path.isfile(qf):
             # print("yes",qf,datfile)
-            x, y = get_ecg_data(datfile)
+            x, y = my_get_ecg_data(datfile)
             x, y = remove_seq_gaps(x, y)
 
             x, y = splitseq(x, 1000, 150), splitseq(y, 1000,
@@ -360,14 +376,3 @@ with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
         b = np.zeros_like(yy_predicted[i, :, :])
         b[np.arange(len(yy_predicted[i, :, :])), yy_predicted[i, :, :].argmax(1)] = 1
         yy_predicted[i, :, :] = b
-
-    # plot:
-    with PdfPages('ecg.pdf') as pdf:
-        for i in range(xxv.shape[0]):
-            print(i)
-            plotecg_validation(xxv[i, :, :], yy_predicted[i, :, :], yyv[i, :, :], 0,
-                               yy_predicted.shape[1])  # top = predicted, bottom=true
-            pdf.savefig()
-            plt.close()
-
-# plotecg(xv[1,:,:],yv[1,:,:],0,yv.shape[1]) ## plot first seq
