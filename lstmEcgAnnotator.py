@@ -15,7 +15,7 @@ import glob, os
 from os.path import basename
 
 import tensorflow as tf
-from keras.layers import Dense, Activation, Dropout
+from keras.layers import Dense, Activation, Dropout, Input
 from keras.layers import LSTM, Bidirectional  # could try TimeDistributed(Dense(...))
 from keras.models import Sequential, load_model
 from keras import optimizers, regularizers
@@ -53,7 +53,7 @@ def my_get_ecg_data(datfile):
     Vctrecord = np.transpose(record[0])
     VctAnnotationHot = np.zeros((6, len(Vctrecord[1])),
                                 dtype=np.int)  # 6 annotation type: 0: P, 1: PQ, 2: QR, 3: RS, 4: ST, 5: ISO (TP)
-    VctAnnotationHot[3] = 1  ## inverse of the others
+    #VctAnnotationHot[3] = 1  ## inverse of the others
     # print("ecg, 2 lead of shape" , Vctrecord.shape)
     # print("VctAnnotationHot of shape" , VctAnnotationHot.shape)
     # print('plotting extracted signal with annotation')
@@ -61,44 +61,43 @@ def my_get_ecg_data(datfile):
 
     VctAnnotations = list(zip(annotation2.sample, annotation2.symbol))  ## zip coordinates + annotations (N),(t) etc)
     # print(VctAnnotations)
+    annsamp = []
+    anntype = []
     for i in range(len(VctAnnotations)):
-        # print(VctAnnotations[i]) # Print to display annotations of an ecg
-        try:
+        annsamp.append(VctAnnotations[i][0])
+        anntype.append(VctAnnotations[i][1])
+    length = len(annsamp)
+    begin = -1
+    end = -1
+    s = 'none'
+    states = {'N': 0, 'st': 1, 't': 2, 'iso': 3, 'p': 4, 'pq': 5}
+    annot_expand = -1 * np.ones(length)
 
-            if VctAnnotations[i][1] == "p":
-                if VctAnnotations[i - 1][1] == "(":
-                    pstart = VctAnnotations[i - 1][0]
-                if VctAnnotations[i + 1][1] == ")":
-                    pend = VctAnnotations[i + 1][0]
-                if VctAnnotations[i + 3][1] == "N":
-                    rpos = VctAnnotations[i + 3][0]
-                    if VctAnnotations[i + 2][1] == "(":
-                        qpos = VctAnnotations[i + 2][0]
-                    if VctAnnotations[i + 4][1] == ")":
-                        spos = VctAnnotations[i + 4][0]
-                    for ii in range(0, 8):  ## search for t (sometimes the "(" for the t  is missing  )
-                        if VctAnnotations[i + ii][1] == "t":
-                            if VctAnnotations[i + ii - 1][1] == "(":
-                                tstart = VctAnnotations[i + ii - 1][0]
-                            else:
-                                tstart = VctAnnotations[i + ii][0]
-                            if VctAnnotations[i + ii + 1] == ")":
-                                tend = VctAnnotations[i + ii + 1][0]
-
-                                VctAnnotationHot[0][qpos:spos] = 1  # QRS
-                                VctAnnotationHot[1][spos:tstart] = 1  # ST
-                                VctAnnotationHot[2][tstart:tend] = 1  # T
-                                VctAnnotationHot[3][tend:pstart] = 1  # ISO
-                                VctAnnotationHot[4][pstart:pend] = 1  # P
-                                VctAnnotationHot[5][pend:qpos] = 1  # PQ
-
-        except IndexError:
-            pass
-
+    for j, samp in enumerate(annsamp):
+        if anntype[j] == '(':
+            begin = samp
+            if (end > 0) & (s != 'none'):
+                if s == 'N':
+                    VctAnnotationHot[1][end:begin] = 1
+                    #annot_expand[end:begin] = states['st']
+                elif s == 't':
+                    VctAnnotationHot[3][end:begin] = 1
+                    #annot_expand[end:begin] = states['iso']
+                elif s == 'p':
+                    VctAnnotationHot[5][end:begin] = 1
+                    #annot_expand[end:begin] = states['pq']
+        elif anntype[j] == ')':
+            end = samp
+            if (begin >= 0) & (s != 'none'):
+                VctAnnotationHot[states[s]][begin:end] = 1
+                #annot_expand[begin:end] = states[s]
+        else:
+            s = anntype[j]
     Vctrecord = np.transpose(Vctrecord)  # transpose to (timesteps,feat)
     VctAnnotationHot = np.transpose(VctAnnotationHot)
     os.chdir(cwd)
     return Vctrecord, VctAnnotationHot
+
 
 # functions
 def get_ecg_data(datfile):
@@ -109,24 +108,25 @@ def get_ecg_data(datfile):
     os.chdir(recordpath)  ## somehow it only works if you chdir.
 
     annotator = annot_type
-    annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None) #read annotation
+    annotation = wfdb.rdann(recordname, extension=annotator, sampfrom=0, sampto=None, pb_dir=None)  # read annotation
     Lstannot = list(zip(annotation.sample, annotation.symbol, annotation.aux_note))
 
-    FirstLstannot = min(i[0] for i in Lstannot) # annot start
-    LastLstannot = max(i[0] for i in Lstannot) - 1 # annot end
+    FirstLstannot = min(i[0] for i in Lstannot)  # annot start
+    LastLstannot = max(i[0] for i in Lstannot) - 1  # annot end
     print("first-last annotation:", FirstLstannot, LastLstannot)
 
     record = wfdb.rdsamp(recordname, sampfrom=FirstLstannot, sampto=LastLstannot)  # read signal
     annotation = wfdb.rdann(recordname, annotator, sampfrom=FirstLstannot,
                             sampto=LastLstannot)  ## get annotation between first and last.
     # this make annotation from 0 to end
-    annotation2 = wfdb.Annotation(record_name=recordname, extension=annot_type, sample=(annotation.sample - FirstLstannot),
+    annotation2 = wfdb.Annotation(record_name=recordname, extension=annot_type,
+                                  sample=(annotation.sample - FirstLstannot),
                                   symbol=annotation.symbol, aux_note=annotation.aux_note)
 
     Vctrecord = np.transpose(record[0])
     VctAnnotationHot = np.zeros((6, len(Vctrecord[1])), dtype=np.int)
     # TODO: default annotation:
-    #VctAnnotationHot[5] = 1  ## inverse of the others
+    # VctAnnotationHot[5] = 1  ## inverse of the others
     # TODO: my annotation:
     VctAnnotationHot[3] = 1
     # print("ecg, 2 lead of shape" , Vctrecord.shape)
@@ -174,7 +174,7 @@ def get_ecg_data(datfile):
                                 VctAnnotationHot[5][pstart:tendpos] = 0
                                 #"""
                                 # TODO: my annotation:
-                                #"""{'N': 0, 'st': 1, 't': 2, 'iso': 3, 'p': 4, 'pq': 5}
+                                # """{'N': 0, 'st': 1, 't': 2, 'iso': 3, 'p': 4, 'pq': 5}
                                 # QRS segment
                                 VctAnnotationHot[0][qpos:spos] = 1
                                 # ST segment
@@ -187,7 +187,7 @@ def get_ecg_data(datfile):
                                 VctAnnotationHot[4][pstart:pend] = 1
                                 # PQ
                                 VctAnnotationHot[5][pend:qpos] = 1
-                                #"""
+                                # """
 
 
         except IndexError:
@@ -197,6 +197,7 @@ def get_ecg_data(datfile):
     VctAnnotationHot = np.transpose(VctAnnotationHot)
     os.chdir(cwd)
     return Vctrecord, VctAnnotationHot
+
 
 # разделияет последовательность x на участки длинной и с перекрытием в o с соседом слева и справа
 def splitseq(x, n, o):
@@ -257,19 +258,20 @@ def normalizesignal_array(x):
         x[i] = st.zscore(x[i], axis=0, ddof=0)
     return x
 
+
 def LoaddDatFiles(datfiles):
     for datfile in datfiles:
         print(datfile)
-        if basename(datfile).split(".", 1)[0] in exclude: # continue exlude files
+        if basename(datfile).split(".", 1)[0] in exclude:  # continue exlude files
             continue
-        qf = os.path.splitext(datfile)[0] + '.' + annot_type # set annot filename
+        qf = os.path.splitext(datfile)[0] + '.' + annot_type  # set annot filename
         if os.path.isfile(qf):
             # print("yes",qf,datfile)
             x, y = my_get_ecg_data(datfile)
             x, y = remove_seq_gaps(x, y)
 
-            x, y = splitseq(x, 1000, 150), splitseq(y, 1000,
-                                                    150)  ## create equal sized numpy arrays of n size and overlap of o
+            x, y = splitseq(x, 1000, 0), splitseq(y, 1000,
+                                                    0)  ## create equal sized numpy arrays of n size and overlap of o
 
             x = normalizesignal_array(x)
             ## todo; add noise, shuffle leads etc. ?
@@ -297,10 +299,24 @@ def get_session(gpu_fraction=0.8):
     else:
         return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
+def mymodel():
+    model = tf.keras.Sequential()
+
+    model.add(Bidirectional(LSTM(128, return_sequences=True),
+                                   input_shape=(seqlength, features)))
+    model.add(Bidirectional(LSTM(64)))
+    model.add(BatchNormalization())
+    model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
+    model.add(Dropout(0.2))
+    model.add(Dense(dimout, activation='softmax'))  # 6
+    adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return (model)
 
 def getmodel():
     model = Sequential()
-    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features))) # 1300 2
+    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features)))  # 1300 2
     model.add(Bidirectional(
         LSTM(32, return_sequences=True)))  # , input_shape=(seqlength, features)) ) ### bidirectional ---><---
     model.add(Dropout(0.2))
@@ -308,7 +324,7 @@ def getmodel():
     model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
     model.add(Dropout(0.2))
     model.add(BatchNormalization())
-    model.add(Dense(dimout, activation='softmax')) # 6
+    model.add(Dense(dimout, activation='softmax'))  # 6
     adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     print(model.summary())
@@ -357,14 +373,21 @@ print("xxv/validation shape: {}, Seqlength: {}, Features: {}".format(xxv.shape[0
 # call keras/tensorflow and build lstm model 
 KTF.set_session(get_session())
 from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
-with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
-    if not os.path.isfile('model_40.h5'):
-        model = getmodel()  # build model
-        model.fit(xxt, yyt, batch_size=128, epochs=40, verbose=1)  # train the model
-        model.save('model_40.h5')
 
-    model = load_model('model_40.h5')
+print(device_lib.list_local_devices())
+# ----------------------------------------------
+epochs = 10
+model_name = 'new_model_' + str(epochs) + '.h5'
+# ----------------------------------------------
+
+with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
+    if not os.path.isfile(model_name):
+        #model = getmodel()  # build model
+        model = getmodel()
+        model.fit(xxt, yyt, batch_size=128, epochs=epochs, verbose=1)  # train the model
+        model.save(model_name)
+
+    model = load_model(model_name)
     score, acc = model.evaluate(xxv, yyv, batch_size=4, verbose=1)
     print('Test score: {} , Test accuracy: {}'.format(score, acc))
 
