@@ -24,7 +24,7 @@ import keras.backend.tensorflow_backend as KTF
 
 np.random.seed(0)
 
-annot_type = "pu1"
+annot_type = "pu"
 
 
 def my_get_ecg_data(datfile):
@@ -338,8 +338,8 @@ perct = 0.81  # percentage training
 percv = 0.19  # percentage validation
 
 exclude = set()
-exclude.update(
-    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:
+"""exclude.update(
+    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:"""
 ##################################################################
 # datfile=qtdbpath+"sel49.dat"  ## single ECG to test if loading works.  
 # x,y=get_ecg_data(datfile)
@@ -377,7 +377,7 @@ from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 # ----------------------------------------------
 epochs = 10
-model_name = 'new_model_' + str(epochs) + '.h5'
+model_name = 'new_model_' + annot_type + "_" + str(epochs) + '.h5'
 # ----------------------------------------------
 
 with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu

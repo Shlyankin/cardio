@@ -8,7 +8,7 @@ import scipy.stats as st
 from os.path import basename
 from my_tools import calc_metr
 np.random.seed(0)
-annot_type = "pu1"
+annot_type = "pu"
 
 
 def my_get_ecg_data(datfile):
@@ -239,23 +239,58 @@ def convertToStandard(annotated):
 
 
 qtdbpath = "data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
-percv = 0.19  # percentage validation
+percv = 0.1  # percentage validation
 exclude = set()
-exclude.update(
-    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:
+"""exclude.update(
+    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:"""
 datfiles = glob.glob(qtdbpath + "*.dat")
 xxv, yyv = LoaddDatFiles(datfiles[-round(len(datfiles) * percv):])  ## validation data.
 
 epochs = 10
-model_name = 'new_model_' + str(epochs) + '.h5'
+model_name = 'new_model_' + annot_type + "_" + str(epochs) + '.h5'
 model = load_model(model_name)
 yy_predicted = model.predict(xxv)
 batch = convertToStandard(yy_predicted)
 annot = convertToStandard(yyv)
+print(calc_metr(batch, annot, type=None))
+print(calc_metr(batch, annot, type='micro'))
 print(calc_metr(batch, annot, type='macro'))
-print(calc_metr(batch, annot, type='samples'))
+#print(calc_metr(batch, annot, type='samples'))
 #batch = convertToStandard(yy_predicted)
 # convert to default annotations
 # type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 # now 0: P, 1: PQ, 2: QR, 3: RS, 4: ST, 5: ISO (TP)
 # calculate metrics
+"""
+lstm_10 epochs
+{'accuracy': 0.8476222222222223, 
+                        QRS             ST          T           ISO         P           PQ
+'precision':    array([0.90837859, 0.72005018, 0.91889856, 0.87310935, 0.83423157, 0.69812122]), 
+'recall':       array([0.855489  , 0.8704021 , 0.77278177, 0.89714951, 0.84311775, 0.84308419]), 
+'f-score':      array([0.88114085, 0.78811945, 0.83952984, 0.8849662 , 0.83865112, 0.76378523])}
+micro
+{'accuracy': 0.8476222222222223, 
+'precision': 0.8476222222222223, 
+'recall': 0.8476222222222223, 
+'f-score': 0.8476222222222224}
+macro
+{'accuracy': 0.8476222222222223, 
+'precision': 0.8254649123445515, 
+'recall': 0.8470040531892561, 
+'f-score': 0.8326987808663464}
+
+lstm pu 10
+{'accuracy': 0.843912, 
+'precision': array([0.9012835 , 0.6625749 , 0.89377781, 0.85368763, 0.89328468, 0.81757406]), 
+'recall': array([0.84777877, 0.88405916, 0.77535334, 0.89727721, 0.86811528, 0.75662682]), 
+'f-score': array([0.87371277, 0.75745831, 0.83036448, 0.87493985, 0.88052016, 0.78592061])}
+{'accuracy': 0.843912, 
+'precision': 0.843912, 
+'recall': 0.843912, 
+'f-score': 0.843912}
+
+{'accuracy': 0.843912, 
+'precision': 0.8370304299320658, 
+'recall': 0.8382017636343106,
+'f-score': 0.8338193614994364}
+"""
