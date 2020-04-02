@@ -5,12 +5,12 @@ from matplotlib.ticker import FormatStrFormatter
 def plot_metrics():
     data = {
         "models": {
-        "QRS_model_6":  {"accuracy": [0.8754], "precision": [0.6254], "recall": [0.6267], "f-score": [0.6261]},
-        "QRS_model_9":  {"accuracy": [0.8782], "precision": [0.6337], "recall": [0.6350], "f-score": [0.6343]},
-        "QRS_model_12": {"accuracy": [0.8743], "precision": [0.6221], "recall": [0.6234], "f-score": [0.6227]},
-        "QRS_model_16": {"accuracy": [0.9025], "precision": [0.7065], "recall": [0.7079], "f-score": [0.7072]},
-        "QRS_model_18": {"accuracy": [0.9016], "precision": [0.7039], "recall": [0.7053], "f-score": [0.7046]},
-        "QRS_model_22": {"accuracy": [0.9031], "precision": [0.7084], "recall": [0.7098], "f-score": [0.7091]}
+            "QRS_model_6":  {"accuracy": [0.8754], "precision": [0.6254], "recall": [0.6267], "f-score": [0.6261]},
+            "QRS_model_9":  {"accuracy": [0.8782], "precision": [0.6337], "recall": [0.6350], "f-score": [0.6343]},
+            "QRS_model_12": {"accuracy": [0.8743], "precision": [0.6221], "recall": [0.6234], "f-score": [0.6227]},
+            "QRS_model_16": {"accuracy": [0.9025], "precision": [0.7065], "recall": [0.7079], "f-score": [0.7072]},
+            "QRS_model_18": {"accuracy": [0.9016], "precision": [0.7039], "recall": [0.7053], "f-score": [0.7046]},
+            "QRS_model_22": {"accuracy": [0.9031], "precision": [0.7084], "recall": [0.7098], "f-score": [0.7091]}
         },
         "QRS": {
             "QRS_model_6":  {"accuracy": [0.9197], "precision": [0.6356], "recall": [0.9165], "f-score": [0.7506]},

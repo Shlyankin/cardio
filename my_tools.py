@@ -31,8 +31,20 @@ def calc_metr_qrs(batch, annot, type='micro'):
     metr["accuracy"] = metrics.accuracy_score(y_pred=seq_pred, y_true=seq_true)
     return metr
 
+def calc_metr(seq_pred, seq_true, type='micro'):
+    metr = {"accuracy": 0,
+            "precision": 0,
+            "recall": 0,
+            "f-score": 0}
+    metr["precision"] = metrics.precision_score(y_pred=seq_pred, y_true=seq_true, labels=[0, 1, 2, 3, 4, 5], average=type)
+    metr["recall"] = metrics.recall_score(y_pred=seq_pred, y_true=seq_true, labels=[0, 1, 2, 3, 4, 5], average=type)
+    metr["f-score"] = metrics.f1_score(y_pred=seq_pred, y_true=seq_true, labels=[0, 1, 2, 3, 4, 5], average=type)
+    metr["accuracy"] = metrics.accuracy_score(y_pred=seq_pred, y_true=seq_true)
+    return metr
 
-def calc_metr(batch, annot, states, type='micro'):
+
+
+def calc_metr_batch(batch, annot, states, type='micro'):
     """    average : string, [None, 'binary' (default), 'micro', 'macro', 'samples', 'weighted']"""
     metr = {"accuracy": 0,
             "precision": 0,
