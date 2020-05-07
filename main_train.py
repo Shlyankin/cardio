@@ -17,7 +17,7 @@ dtst.split([0.9, 0.1])
 # Training models and they states
 # {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 all_states = {
-    "QRS_model_6":      [1, 2, 3, 4, 5, 6],
+    "QRS_model_6":       [1, 2, 3, 4, 5, 6],
     #"QRS_model_8":      [3, 4, 5, 6, 7, 8],
     #"QRS_model_11":     [3, 4, 6, 8, 10, 11],
     #"QRS_model_14":     [3, 5, 8, 10, 13, 14],

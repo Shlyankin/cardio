@@ -2,6 +2,53 @@ import numpy as np
 from sklearn import metrics
 import matplotlib.pyplot as plt
 from cardio import EcgBatch
+from cardio.core.ecg_batch_tools import load_wfdb
+
+def get_meta(path, ann_ext):
+    components = ["meta"]
+    return load_wfdb(path, components, ann_ext=ann_ext)[0]
+
+def show_ecg(signal, annot, labels, states, meta, start, end, subplot_size=(10, 4), ):
+    if signal.ndim != 2:
+        raise ValueError("Each signal in batch must be 2-D ndarray")
+
+    fs = meta["fs"]
+    num_channels = signal.shape[0]
+    start = np.int(start * fs)
+    end = signal.shape[1] if end is None else np.int(end * fs)
+
+    figsize = (subplot_size[0], subplot_size[1] * num_channels)
+    _, axes = plt.subplots(num_channels, 1, squeeze=False, figsize=figsize)
+
+    for channel, (ax,) in enumerate(axes):
+        lead_name = "undefined" if meta["signame"][channel] == "None" else meta["signame"][channel]
+        units = "undefined" if meta["units"][channel] is None else meta["units"][channel]
+        ax.plot((np.arange(start, end) / fs), signal[channel, start:end])
+        ax.set_title("Lead name: {}".format(lead_name))
+        ax.set_xlabel("Time (sec)")
+        ax.set_ylabel("Amplitude ({})".format(units))
+        ax.grid(True, which="major")
+
+    def fill_segments(signal_states, start_segment, end_segment, color, label=None):
+        """Fill ECG segments with a given color."""
+        starts, ends = find_intervals_borders(signal_states, np.arange(start_segment, end_segment))
+        i = 0
+        for start_t, end_t in zip((starts + start) / fs, (ends + start) / fs):
+            for (ax,) in axes:
+                ax.axvspan(start_t, end_t, color=color, alpha=0.3, label="_"*i + label)
+            i+=1
+
+    signal_states = annot[start:end]
+    colors = ["red", "green", "blue", "magenta", "yellow", "cyan"]
+    for i in range(len(states)):
+        if i == 0: fill_segments(signal_states, 0, states[i], colors[i], labels[i])
+        else: fill_segments(signal_states, states[i-1], states[i], colors[i], labels[i])
+    plt.tight_layout()
+    for (ax,) in axes:
+        ax.legend()
+    plt.show()
+
+
 
 def calc_metr_qrs(batch, annot, type='micro'):
     def transform(annotation):
@@ -59,7 +106,7 @@ def calc_metr_batch(batch, annot, states, type='micro'):
         expanded[expanded == -1] = 0
         expanded = expanded.astype(np.int32)
         seq_true = np.concatenate((seq_true, expanded))
-        transformed_annotation = transform_annot(batch.get(component=annot)[i], states)
+        transformed_annotation = transform_annot(batch.get(component=annot)[i].copy(), states)
         seq_pred = np.concatenate((seq_pred, transformed_annotation))
     metr["precision"] = metrics.precision_score(y_pred=seq_pred, y_true=seq_true, labels=[0, 1, 2, 3, 4, 5], average=type)
     metr["recall"] = metrics.recall_score(y_pred=seq_pred, y_true=seq_true, labels=[0, 1, 2, 3, 4, 5], average=type)
@@ -213,6 +260,8 @@ def calculate_old_metrics(batch, annot, states, state_num):
 
 
 def find_intervals_borders(hmm_annotation, inter_val):
+    hmm_annotation[0] = inter_val[len(inter_val) - 1] + 1
+    hmm_annotation[len(hmm_annotation) - 1] = inter_val[len(inter_val) - 1] + 1
     intervals = np.zeros(hmm_annotation.shape, dtype=np.int8)
     for val in inter_val:
         intervals = np.logical_or(intervals, (hmm_annotation == val).astype(np.int8)).astype(np.int8)

@@ -1,8 +1,31 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from keras.utils import plot_model
+from keras.engine.saving import load_model
 from matplotlib.ticker import FormatStrFormatter
+import os
+os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
 def plot_metrics():
+    data = {
+        "Скрытая\n марковская модель": {"accuracy": [0.70], "precision": [0.62], "recall": [0.68], "f1-score": [0.64]},
+        "LSTM сеть":                    {"accuracy": [0.84], "precision": [0.83], "recall": [0.83], "f1-score": [0.83]},
+        "Алгоритм\nПана-Томпкинса": {"accuracy": [0.93], "precision": [0.87], "recall": [0.55], "f1-score": [0.68]}
+    }
+    metrics = ["accuracy", "precision", "recall", "f1-score"]
+    _, axes = plt.subplots(nrows=1, ncols=4, figsize=(18, 6))
+    for i in range(4):
+        ax: plt.Axes = axes[i]
+        ax.set_ylim(ymin=0.0, ymax=1.0)
+        for model in data.keys():
+            ax.bar(model, data[model][metrics[i]], width=0.5, label=model)
+        ax.set_xlabel("Методы")
+        ax.set_ylabel(metrics[i])
+        ax.set_title("Метрика: " + metrics[i])
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), shadow=True, ncol=1)
+    plt.show()
+
+def plot_metrics_hmm():
     data = {
         "models": {
             "QRS_model_6":  {"accuracy": [0.8754], "precision": [0.6254], "recall": [0.6267], "f-score": [0.6261]},
@@ -298,10 +321,16 @@ def plot_pp_lab5():
     plt.rc('legend', fontsize=22)  # legend fontsize
     plt.rc('figure', titlesize=48)  # fontsize of the figure title
     plt.show()
+def plot_mymodel():
+    model_name = 'new_model_' + "pu" + "_" + "10" + '.h5'
+    model = load_model(model_name)
+    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
 #plot_pp_lab5()
 #plot_pp_lab4()
 #plot_pp_lab3()
 #plot_pp_lab2()
 #plot_pp_lab1()
-plot_time()
+#plot_time()
+#plot_metrics()
+#plot_mymodel()
 plot_metrics()

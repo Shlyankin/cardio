@@ -3,7 +3,7 @@ import numpy as np
 import cardio.batchflow as bf
 from cardio import EcgBatch
 from my_pipelines.my_pipelines import PanTompkinsPipeline, HMM_predict_pipeline, LoadEcgPipeline, HilbertTransformPipeline
-from my_tools import calculate_old_metrics, calculate_metrics, calc_metr_batch, calc_metr_qrs
+from my_tools import calculate_old_metrics, calculate_metrics, calc_metr_batch, calc_metr_qrs, get_meta, show_ecg
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -61,9 +61,9 @@ all_states = {
         #"QRS_model_6":         [1, 2, 3, 4, 5, 6],
         #"QRS_model_8":         [3, 4, 5, 6, 7, 8],
         #"QRS_model_11":        [3, 4, 6, 8, 10, 11],
-        #"QRS_model_14":     [3, 5, 8, 10, 13, 14],
-        "QRS_model_16":        [3, 5, 8, 11, 14, 16],
-        #"QRS_model_19":        [3, 5, 11, 14, 17, 19],
+        #"QRS_model_14":        [3, 5, 8, 10, 13, 14],
+        #"QRS_model_16":         [3, 5, 8, 11, 14, 16],
+        "QRS_model_19":        [3, 5, 11, 14, 17, 19],
         #"QRS_model_8_ST":      [1, 4, 5, 6, 7, 8],
         #"QRS_model_8_T":       [1, 2, 5, 6, 7, 8],
         #"QRS_model_8_ISO":     [1, 2, 3, 6, 7, 8],
@@ -80,16 +80,30 @@ all_states = {
 type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
 process_states_pipeline = LoadEcgPipeline(batch_size=len(dtst.test), annot_ext="pu1")
 #---------------------------------------NEW METRICS-----------------------------------------
-#"""
+"""
 for model_name in all_states.keys():
     process_states_pipeline_for_model = process_states_pipeline + HMM_predict_pipeline(
         "" + model_name + ".dill", annot="hmm_annotation" + model_name)
     batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuffle=False, drop_last=False,
                                                                  n_epochs=1, lazy=True).next_batch()
     metr = calc_metr_batch(batch, "hmm_annotation" + model_name, all_states[model_name], type="macro")
+    i = batch.get_pos(None, "signal", "sel100")
+    show_ecg(batch.signal[i], batch.get(component="hmm_annotation" + model_name)[i],
+             ["QRS", "ST", "T", "ISO", "P", "PQ"], all_states[model_name], batch.meta[i], 10, 15)
     for m in metr.keys():
         print(model_name + "\t" + m + "\t" + str(metr[m]))
     print()
+#"""
+"""
+    batch.my_show_ecg(np.array([
+    np.array(list(range(all_states[model_name][0])), np.int64),
+    np.array(list(range(all_states[model_name][0], all_states[model_name][1])), np.int64),
+    np.array(list(range(all_states[model_name][1], all_states[model_name][2])), np.int64),
+    np.array(list(range(all_states[model_name][3], all_states[model_name][4])), np.int64),
+    np.array(list(range(all_states[model_name][4], all_states[model_name][5])), np.int64)
+    ]),
+    'sel100', start=12, end=17, annot="hmm_annotation" + model_name)
+"""
 #"""
 #--------------------------------------OLD METRICS-----------------------------------------
 """
@@ -143,6 +157,10 @@ batch = (dtst.test >> process_states_pipeline_for_model).run(batch_size=20, shuf
 metr = calc_metr_qrs(batch, "pan_tomp_annotation", type="binary")
 for m in metr.keys():
     print("pan_tomp_annotation" + "\t" + m + "\t" + str(metr[m]))
+
+i = batch.get_pos(None, "signal", "sel100")
+show_ecg(batch.signal[i], batch.get(component="pan_tomp_annotation")[i],
+         ["Other", "QRS"], [1, 2], batch.meta[i], 10, 15)
 #"""
 #OLD METRICS
 """
@@ -179,14 +197,15 @@ print("Hilbert-transform" +
 #"""
 
 #---------------------------------------SHOW ECG----------------------------------------
+
+#-------------------------------------------------------------------
 """
--------------------------------------------------------------------
-    #show example Annotated ECG
-    batch.my_show_ecg(np.array([
-        np.array(list(range(states[0])), np.int64),
-        #np.array(list(range(states[0], states[1])), np.int64),
-        np.array(list(range(states[1], states[2])), np.int64),
-        np.array(list(range(states[3], states[4])), np.int64)
-        ]),
-        'sel100', start=12, end=17, annot="hmm_annotation")
+#show example Annotated ECG
+batch.my_show_ecg(np.array([
+    np.array(list(range(states[0])), np.int64),
+    #np.array(list(range(states[0], states[1])), np.int64),
+    np.array(list(range(states[1], states[2])), np.int64),
+    np.array(list(range(states[3], states[4])), np.int64)
+    ]),
+    'sel100', start=12, end=17, annot="hmm_annotation")
 """

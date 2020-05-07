@@ -16,7 +16,7 @@ from os.path import basename
 
 import tensorflow as tf
 from keras.layers import Dense, Activation, Dropout, Input
-from keras.layers import LSTM, Bidirectional  # could try TimeDistributed(Dense(...))
+from keras.layers import LSTM, Bidirectional, Conv1D, Conv2D, Flatten
 from keras.models import Sequential, load_model
 from keras import optimizers, regularizers
 from keras.layers.normalization import BatchNormalization
@@ -299,6 +299,40 @@ def get_session(gpu_fraction=0.8):
     else:
         return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
+def plot_history(history):
+    # Plot training & validation accuracy values
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
+    #
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
+
+def getmodel():
+    model = Sequential()
+    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features)))  # 1000 2
+    model.add(Bidirectional(
+        LSTM(32, return_sequences=True)))  # , input_shape=(seqlength, features)) ) ### bidirectional ---><---
+    model.add(Dropout(0.2))
+    model.add(BatchNormalization())
+    model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
+    model.add(Dropout(0.2))
+    model.add(BatchNormalization())
+    model.add(Dense(dimout, activation='softmax'))  # 6
+    adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return (model)
+
 def mymodel():
     model = tf.keras.Sequential()
 
@@ -314,21 +348,14 @@ def mymodel():
     print(model.summary())
     return (model)
 
-def getmodel():
+def convNN():
     model = Sequential()
-    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features)))  # 1300 2
-    model.add(Bidirectional(
-        LSTM(32, return_sequences=True)))  # , input_shape=(seqlength, features)) ) ### bidirectional ---><---
-    model.add(Dropout(0.2))
-    model.add(BatchNormalization())
-    model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
-    model.add(Dropout(0.2))
-    model.add(BatchNormalization())
-    model.add(Dense(dimout, activation='softmax'))  # 6
+    model.add(Conv2D(64, kernel_size=3, activation='relu', input_shape=(seqlength, features)))
+    model.add(Conv2D(32, kernel_size=3, activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(dimout, activation='softmax'))
     adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
-    print(model.summary())
-    return (model)
 
 
 ##################################################################
@@ -340,18 +367,6 @@ percv = 0.19  # percentage validation
 exclude = set()
 """exclude.update(
     ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:"""
-##################################################################
-# datfile=qtdbpath+"sel49.dat"  ## single ECG to test if loading works.  
-# x,y=get_ecg_data(datfile)
-# print(x.shape,y.shape)
-# # for i in range(y.shape[0]): #Invert QT-label to actually represent QT. Does give overlapping labels
-# # 	y[i][0] = 1 - y[i][0]
-# plotecg(x,y,0,y.shape[0]) ## plot all
-# x,y=remove_seq_gaps(x,y) ## remove 'annotation gaps'
-# plotecg(x,y,0,y.shape[0]) ## plot all
-# x,y=splitseq(x,750,150),splitseq(y,750,150) ## create equal sized numpy arrays of n size and overlap of o 
-# exit()
-##################################################################
 
 # load data
 datfiles = glob.glob(qtdbpath + "*.dat")
@@ -362,13 +377,6 @@ seqlength = xxt.shape[1]
 features = xxt.shape[2]
 dimout = yyt.shape[2]
 print("xxv/validation shape: {}, Seqlength: {}, Features: {}".format(xxv.shape[0], seqlength, features))
-# #plot validation ecgs 
-# with PdfPages('ecgs_xxv.pdf') as pdf:
-# 	for i in range( xxv.shape[0] ): 
-# 		print (i)
-# 		plotecg(xxv[i,:,:],yyv[i,:,:],0,yyv.shape[1])
-# 		pdf.savefig()
-# 		plt.close()
 
 # call keras/tensorflow and build lstm model 
 KTF.set_session(get_session())
@@ -376,26 +384,18 @@ from tensorflow.python.client import device_lib
 
 print(device_lib.list_local_devices())
 # ----------------------------------------------
-epochs = 10
+# set info
+epochs = 3
 model_name = 'new_model_' + annot_type + "_" + str(epochs) + '.h5'
 # ----------------------------------------------
-
 with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
     if not os.path.isfile(model_name):
-        #model = getmodel()  # build model
         model = getmodel()
-        model.fit(xxt, yyt, batch_size=128, epochs=epochs, verbose=1)  # train the model
+        history = model.fit(xxt, yyt, validation_data=(xxv, yyv) , batch_size=128, epochs=epochs, verbose=1)
         model.save(model_name)
 
+    """
     model = load_model(model_name)
     score, acc = model.evaluate(xxv, yyv, batch_size=4, verbose=1)
     print('Test score: {} , Test accuracy: {}'.format(score, acc))
-
-    # predict
-    yy_predicted = model.predict(xxv)
-
-    # maximize probabilities of prediction.
-    for i in range(yyv.shape[0]):
-        b = np.zeros_like(yy_predicted[i, :, :])
-        b[np.arange(len(yy_predicted[i, :, :])), yy_predicted[i, :, :].argmax(1)] = 1
-        yy_predicted[i, :, :] = b
+    """
