@@ -1,7 +1,5 @@
 # import matplotlib with pdf as backend
 import matplotlib
-
-matplotlib.use('PDF')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -15,9 +13,10 @@ import glob, os
 from os.path import basename
 
 import tensorflow as tf
-from keras.layers import Dense, Activation, Dropout, Input
-from keras.layers import LSTM, Bidirectional, Conv1D, Conv2D, Flatten
-from keras.models import Sequential, load_model
+from keras.layers import Dense, Activation, Dropout, Input, MaxPooling1D, concatenate
+from keras.layers import LSTM, Bidirectional, Conv1D, Conv1D, Flatten, UpSampling1D
+from keras.layers import Cropping1D, ZeroPadding1D
+from keras.models import Sequential, load_model, Model
 from keras import optimizers, regularizers
 from keras.layers.normalization import BatchNormalization
 import keras.backend.tensorflow_backend as KTF
@@ -270,7 +269,7 @@ def LoaddDatFiles(datfiles):
             x, y = my_get_ecg_data(datfile)
             x, y = remove_seq_gaps(x, y)
 
-            x, y = splitseq(x, 1000, 0), splitseq(y, 1000,
+            x, y = splitseq(x, split_size, 0), splitseq(y, split_size,
                                                     0)  ## create equal sized numpy arrays of n size and overlap of o
 
             x = normalizesignal_array(x)
@@ -301,8 +300,8 @@ def get_session(gpu_fraction=0.8):
 
 def plot_history(history):
     # Plot training & validation accuracy values
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
     plt.title('Model accuracy')
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
@@ -334,14 +333,17 @@ def getmodel():
     return (model)
 
 def mymodel():
-    model = tf.keras.Sequential()
-
-    model.add(Bidirectional(LSTM(128, return_sequences=True),
-                                   input_shape=(seqlength, features)))
-    model.add(Bidirectional(LSTM(64)))
+    model = Sequential()
+    model.add(Dense(32, W_regularizer=regularizers.l2(l=0.01), input_shape=(seqlength, features)))  # 1000 2
+    model.add(Bidirectional(LSTM(32, return_sequences=True)))
+    model.add(Dropout(0.2))
     model.add(BatchNormalization())
     model.add(Dense(64, activation='relu', W_regularizer=regularizers.l2(l=0.01)))
     model.add(Dropout(0.2))
+    model.add(BatchNormalization())
+    model.add(Bidirectional(LSTM(32, return_sequences=True)))
+    model.add(Dropout(0.2))
+    model.add(BatchNormalization())
     model.add(Dense(dimout, activation='softmax'))  # 6
     adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
@@ -350,50 +352,160 @@ def mymodel():
 
 def convNN():
     model = Sequential()
-    model.add(Conv2D(64, kernel_size=3, activation='relu', input_shape=(seqlength, features)))
-    model.add(Conv2D(32, kernel_size=3, activation='relu'))
-    model.add(Flatten())
+    model.add(Conv1D(128, kernel_size=6, padding="same", activation='relu', input_shape=(seqlength, features)))  # 1000 2
+    model.add(Bidirectional(LSTM(6, return_sequences=True)))
+    model.add(Conv1D(64, kernel_size=6, padding="same", activation='relu', input_shape=(seqlength, features)))
+    model.add(Bidirectional(LSTM(6, return_sequences=True)))
+    model.add(Conv1D(32, kernel_size=6, padding="same", activation='relu'))
     model.add(Dense(dimout, activation='softmax'))
     adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return (model)
 
+def cnn():
+    model = Sequential()
+    model.add(
+        Conv1D(128, kernel_size=6, padding="same", activation='relu', input_shape=(seqlength, features)))  # 1000 2
+    model.add(Conv1D(64, kernel_size=6, padding="same", activation='relu', input_shape=(seqlength, features)))
+    model.add(Conv1D(32, kernel_size=6, padding="same", activation='relu'))
+    model.add(Bidirectional(LSTM(6, return_sequences=True)))
+    model.add(Dense(dimout, activation='softmax'))
+    adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return (model)
+
+def just():
+    model = Sequential()
+    model.add(Dense(50, activation='relu', input_shape=(seqlength, features)))
+    model.add(Bidirectional(LSTM(32, return_sequences=True)))
+    model.add(Dropout(0.2))
+    model.add(BatchNormalization())
+    model.add(Dense(32, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(BatchNormalization())
+    model.add(Dense(dimout, activation='softmax'))
+    model.compile(optimizer='adam',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return (model)
+
+def unet():
+    def get_crop_shape(target, refer):
+        # height, the 2nd dimension
+        ch = (target.get_shape()[1] - refer.get_shape()[1]).value
+        assert (ch >= 0)
+        if ch % 2 != 0:
+            ch1, ch2 = int(ch / 2), int(ch / 2) + 1
+        else:
+            ch1, ch2 = int(ch / 2), int(ch / 2)
+
+        return (ch1, ch2)
+
+    num_class = dimout
+    input_shape = (seqlength, features)
+    concat_axis = features
+    inputs = Input(shape = input_shape)
+
+    conv1 = Conv1D(512, 6, activation='relu', padding='same', name='conv1_1')(inputs)
+    conv1 = Conv1D(512, 6, activation='relu', padding='same')(conv1)
+    pool1 = MaxPooling1D(pool_size=2)(conv1)
+    conv2 = Conv1D(256, 6, activation='relu', padding='same')(pool1)
+    conv2 = Conv1D(256, 6, activation='relu', padding='same')(conv2)
+    pool2 = MaxPooling1D(pool_size=2)(conv2)
+
+    conv3 = Conv1D(128, 6, activation='relu', padding='same')(pool2)
+    conv3 = Conv1D(128, 6, activation='relu', padding='same')(conv3)
+    pool3 = MaxPooling1D(pool_size=2)(conv3)
+
+    conv4 = Conv1D(64, 6, activation='relu', padding='same')(pool3)
+    conv4 = Conv1D(64, 6, activation='relu', padding='same')(conv4)
+    pool4 = MaxPooling1D(pool_size=2)(conv4)
+
+    conv5 = Conv1D(32, 6, activation='relu', padding='same')(pool4)
+    conv5 = Conv1D(32, 6, activation='relu', padding='same')(conv5)
+
+    up_conv5 = UpSampling1D(size=2)(conv5)
+    ch = get_crop_shape(conv4, up_conv5)
+    crop_conv4 = Cropping1D(cropping=(ch))(conv4)
+    up6 = concatenate([up_conv5, crop_conv4], axis=concat_axis)
+    conv6 = Conv1D(64, 6, activation='relu', padding='same')(up6)
+    conv6 = Conv1D(64, 6, activation='relu', padding='same')(conv6)
+
+    up_conv6 = UpSampling1D(size=2)(conv6)
+    ch = get_crop_shape(conv3, up_conv6)
+    crop_conv3 = Cropping1D(cropping=(ch))(conv3)
+    up7 = concatenate([up_conv6, crop_conv3], axis=concat_axis)
+    conv7 = Conv1D(128, 6, activation='relu', padding='same')(up7)
+    conv7 = Conv1D(128, 6, activation='relu', padding='same')(conv7)
+
+    up_conv7 = UpSampling1D(size=2)(conv7)
+    ch = get_crop_shape(conv2, up_conv7)
+    crop_conv2 = Cropping1D(cropping=(ch))(conv2)
+    up8 = concatenate([up_conv7, crop_conv2], axis=concat_axis)
+    conv8 = Conv1D(256, 6, activation='relu', padding='same')(up8)
+    conv8 = Conv1D(256, 6, activation='relu', padding='same')(conv8)
+
+    up_conv8 = UpSampling1D(size=2)(conv8)
+    ch = get_crop_shape(conv1, up_conv8)
+    crop_conv1 = Cropping1D(cropping=(ch))(conv1)
+    up9 = concatenate([up_conv8, crop_conv1], axis=concat_axis)
+    conv9 = Conv1D(512, 6, activation='relu', padding='same')(up9)
+    conv9 = Conv1D(512, 6, activation='relu', padding='same')(conv9)
+
+    ch = get_crop_shape(inputs, conv9)
+    conv9 = ZeroPadding1D(padding=((ch[0], ch[1])))(conv9)
+    conv10 = Conv1D(num_class, 1, activation='softmax')(conv9)
+
+    model = Model(inputs=inputs, outputs=conv10)
+    adam = optimizers.adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    print(model.summary())
+    return model
 
 ##################################################################
 ##################################################################
+split_size = 1000
 qtdbpath = "data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
-perct = 0.81  # percentage training
-percv = 0.19  # percentage validation
+perct = 0.9 # percentage training
+percv = 0.1 # percentage validation
 
 exclude = set()
 """exclude.update(
-    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:"""
+    ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  
+    # no P annotated:"""
 
 # load data
 datfiles = glob.glob(qtdbpath + "*.dat")
 xxt, yyt = LoaddDatFiles(datfiles[:round(len(datfiles) * perct)])  # training data.
 xxt, yyt = unison_shuffled_copies(xxt, yyt)  ### shuffle
 xxv, yyv = LoaddDatFiles(datfiles[-round(len(datfiles) * percv):])  ## validation data.
+
 seqlength = xxt.shape[1]
 features = xxt.shape[2]
 dimout = yyt.shape[2]
 print("xxv/validation shape: {}, Seqlength: {}, Features: {}".format(xxv.shape[0], seqlength, features))
 
-# call keras/tensorflow and build lstm model 
+# call keras/tensorflow and build model
 KTF.set_session(get_session())
 from tensorflow.python.client import device_lib
 
 print(device_lib.list_local_devices())
 # ----------------------------------------------
 # set info
-epochs = 3
-model_name = 'new_model_' + annot_type + "_" + str(epochs) + '.h5'
+epochs = 8
+model_name = 'unet_' + annot_type + "_" + str(epochs) + '.h5'
 # ----------------------------------------------
 with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
     if not os.path.isfile(model_name):
-        model = getmodel()
-        history = model.fit(xxt, yyt, validation_data=(xxv, yyv) , batch_size=128, epochs=epochs, verbose=1)
+        model = unet()
+        history = model.fit(xxt, yyt, validation_data=(xxv, yyv), batch_size=10, epochs=epochs, verbose=1)
         model.save(model_name)
-
+        plot_history(history)
     """
     model = load_model(model_name)
     score, acc = model.evaluate(xxv, yyv, batch_size=4, verbose=1)

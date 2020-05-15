@@ -157,7 +157,7 @@ def LoaddDatFiles(datfiles):
             x, y = my_get_ecg_data(datfile)
             x, y = remove_seq_gaps(x, y)
 
-            x, y = splitseq(x, 1000, 0), splitseq(y, 1000, 0)  ## create equal sized numpy arrays of n size and overlap of o
+            x, y = splitseq(x, split_size, 0), splitseq(y, split_size, 0)  ## create equal sized numpy arrays of n size and overlap of o
 
             x = normalizesignal_array(x)
             ## todo; add noise, shuffle leads etc. ?
@@ -177,24 +177,26 @@ def convertToStandard(annotated):
     return batch
 
 
-
+split_size = 1000
 qtdbpath = "data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
 percv = 0.1  # percentage validation
 exclude = set()
 """exclude.update(
     ["sel35", "sel36", "sel37", "sel50", "sel102", "sel104", "sel221", "sel232", "sel310"])  # no P annotated:"""
 datfiles = glob.glob(qtdbpath + "*.dat")
-#xxv, yyv = LoaddDatFiles(datfiles[-round(len(datfiles) * percv):])  ## validation data.
+xxv, yyv = LoaddDatFiles(datfiles[-round(len(datfiles) * percv):])  ## validation data.
 
-epochs = 10
-model_name = 'new_model_' + annot_type + "_" + str(epochs) + '.h5'
+epochs = 8
+model_name = 'unet_' + annot_type + "_" + str(epochs) + '.h5'
 model = load_model(model_name)
-"""yy_predicted = model.predict(xxv)
+yy_predicted = model.predict(xxv)
 batch = convertToStandard(yy_predicted)
 annot = convertToStandard(yyv)
 print(calc_metr(batch, annot, type=None))
 print(calc_metr(batch, annot, type='micro'))
-print(calc_metr(batch, annot, type='macro'))"""
+print(calc_metr(batch, annot, type='macro'))
+# plot result
+"""
 x = get_ecg_record(qtdbpath+"sel100")
 xpred = splitseq(x, 1000, 0)
 xpred = normalizesignal_array(xpred)
@@ -202,14 +204,8 @@ y = model.predict(xpred)
 y = convertToStandard(y)
 x = x.transpose()
 show_ecg(x, y, ["QRS", "ST", "T", "ISO", "P", "PQ"], [1, 2, 3, 4, 5, 6], get_meta('sel100', annot_type), 10, 15)
-"""show_ecg(batch.signal[0], batch.get(component="hmm_annotation" + model_name),
-             type_states.items(), all_states[model_name], batch.meta, 10, 15)"""
-#print(calc_metr(batch, annot, type='samples'))
-#batch = convertToStandard(yy_predicted)
-# convert to default annotations
-# type_states = {0: "QRS", 1: "ST", 2: "T", 3: "ISO", 4: "P", 5: "PQ"}
-# now 0: P, 1: PQ, 2: QR, 3: RS, 4: ST, 5: ISO (TP)
-# calculate metrics
+"""
+# metrics
 """
 lstm_10 epochs
 {'accuracy': 0.8476222222222223, 
@@ -243,4 +239,43 @@ lstm pu 10
 'precision': 0.8370304299320658, 
 'recall': 0.8382017636343106,
 'f-score': 0.8338193614994364}
+
+lstm+cnn
+{'accuracy': 0.8742271111111111, 
+'precision':    array([0.88620391, 0.78278892, 0.89649146, 0.86522716, 0.93212555, 0.87387318]), 
+'recall':       array([0.91008705, 0.85774024, 0.83291301, 0.91530882, 0.8735476 , 0.80280991]), 
+'f-score':      array([0.89798671, 0.81855242, 0.86353356, 0.88956366, 0.90188641, 0.8368356 ])}
+{'accuracy': 0.8742271111111111, 
+'precision': 0.8742271111111111, 
+'recall': 0.8742271111111111, 
+'f-score': 0.8742271111111112}
+
+{'accuracy': 0.8742271111111111, 
+'precision': 0.8727850298849206, 
+'recall': 0.8654011059637088, 
+'f-score': 0.8680597263566}
+
+cnnv2pu_5
+{'accuracy': 0.8621671111111111, 'precision': array([0.89871635, 0.77503271, 0.84710791, 0.86838736, 0.91802351,
+       0.85792967]), 'recall': array([0.89365217, 0.7883838 , 0.84792566, 0.89602208, 0.88540125,
+       0.77801695]), 'f-score': array([0.89617711, 0.78165125, 0.84751659, 0.88198831, 0.90141733,
+       0.81602152])}
+{'accuracy': 0.8621671111111111, 'precision': 0.8621671111111111, 'recall': 0.8621671111111111, 'f-score': 0.8621671111111111}
+{'accuracy': 0.8621671111111111, 'precision': 0.8608662536052837, 'recall': 0.8482336514078389, 'f-score': 0.8541286839068758}
+
+cnnv2pu_10
+{'accuracy': 0.8511182222222222, 'precision': array([0.84672091, 0.722596  , 0.83883051, 0.91208299, 0.89182082,
+       0.83069844]), 'recall': array([0.8902391 , 0.85028199, 0.84927195, 0.84402863, 0.87577107,
+       0.76329069]), 'f-score': array([0.86793484, 0.78125623, 0.84401894, 0.87673716, 0.88372308,
+       0.79556927])}
+{'accuracy': 0.8511182222222222, 'precision': 0.8511182222222222, 'recall': 0.8511182222222222, 'f-score': 0.8511182222222222}
+{'accuracy': 0.8511182222222222, 'precision': 0.8404582774032177, 'recall': 0.8454805717393113, 'f-score': 0.8415399207241899}
+
+unet_8
+{'accuracy': 0.8967582222222222, 'precision': array([0.94589594, 0.77782195, 0.90688253, 0.89030552, 0.9363471 ,
+       0.93443807]), 'recall': array([0.91280903, 0.88952281, 0.86941982, 0.90332819, 0.94270612,
+       0.86711565]), 'f-score': array([0.92905799, 0.82993078, 0.88775613, 0.89676958, 0.93951585,
+       0.89951897])}
+{'accuracy': 0.8967582222222222, 'precision': 0.8967582222222222, 'recall': 0.8967582222222222, 'f-score': 0.8967582222222222}
+{'accuracy': 0.8967582222222222, 'precision': 0.8986151862964843, 'recall': 0.8974836019601558, 'f-score': 0.897091549564894}
 """
