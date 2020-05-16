@@ -411,51 +411,51 @@ def unet():
     concat_axis = features
     inputs = Input(shape = input_shape)
 
-    conv1 = Conv1D(512, 6, activation='relu', padding='same', name='conv1_1')(inputs)
-    conv1 = Conv1D(512, 6, activation='relu', padding='same')(conv1)
+    conv1 = Conv1D(64, 6, activation='relu', padding='same', name='conv1_1')(inputs)
+    conv1 = Conv1D(64, 6, activation='relu', padding='same')(conv1)
     pool1 = MaxPooling1D(pool_size=2)(conv1)
-    conv2 = Conv1D(256, 6, activation='relu', padding='same')(pool1)
-    conv2 = Conv1D(256, 6, activation='relu', padding='same')(conv2)
+    conv2 = Conv1D(128, 6, activation='relu', padding='same')(pool1)
+    conv2 = Conv1D(128, 6, activation='relu', padding='same')(conv2)
     pool2 = MaxPooling1D(pool_size=2)(conv2)
 
-    conv3 = Conv1D(128, 6, activation='relu', padding='same')(pool2)
-    conv3 = Conv1D(128, 6, activation='relu', padding='same')(conv3)
+    conv3 = Conv1D(256, 6, activation='relu', padding='same')(pool2)
+    conv3 = Conv1D(256, 6, activation='relu', padding='same')(conv3)
     pool3 = MaxPooling1D(pool_size=2)(conv3)
 
-    conv4 = Conv1D(64, 6, activation='relu', padding='same')(pool3)
-    conv4 = Conv1D(64, 6, activation='relu', padding='same')(conv4)
+    conv4 = Conv1D(512, 6, activation='relu', padding='same')(pool3)
+    conv4 = Conv1D(512, 6, activation='relu', padding='same')(conv4)
     pool4 = MaxPooling1D(pool_size=2)(conv4)
 
-    conv5 = Conv1D(32, 6, activation='relu', padding='same')(pool4)
-    conv5 = Conv1D(32, 6, activation='relu', padding='same')(conv5)
+    conv5 = Conv1D(1024, 6, activation='relu', padding='same')(pool4)
+    conv5 = Conv1D(512, 6, activation='relu', padding='same')(conv5)
 
     up_conv5 = UpSampling1D(size=2)(conv5)
     ch = get_crop_shape(conv4, up_conv5)
     crop_conv4 = Cropping1D(cropping=(ch))(conv4)
     up6 = concatenate([up_conv5, crop_conv4], axis=concat_axis)
-    conv6 = Conv1D(64, 6, activation='relu', padding='same')(up6)
-    conv6 = Conv1D(64, 6, activation='relu', padding='same')(conv6)
+    conv6 = Conv1D(512, 6, activation='relu', padding='same')(up6)
+    conv6 = Conv1D(256, 6, activation='relu', padding='same')(conv6)
 
     up_conv6 = UpSampling1D(size=2)(conv6)
     ch = get_crop_shape(conv3, up_conv6)
     crop_conv3 = Cropping1D(cropping=(ch))(conv3)
     up7 = concatenate([up_conv6, crop_conv3], axis=concat_axis)
-    conv7 = Conv1D(128, 6, activation='relu', padding='same')(up7)
+    conv7 = Conv1D(256, 6, activation='relu', padding='same')(up7)
     conv7 = Conv1D(128, 6, activation='relu', padding='same')(conv7)
 
     up_conv7 = UpSampling1D(size=2)(conv7)
     ch = get_crop_shape(conv2, up_conv7)
     crop_conv2 = Cropping1D(cropping=(ch))(conv2)
     up8 = concatenate([up_conv7, crop_conv2], axis=concat_axis)
-    conv8 = Conv1D(256, 6, activation='relu', padding='same')(up8)
-    conv8 = Conv1D(256, 6, activation='relu', padding='same')(conv8)
+    conv8 = Conv1D(128, 6, activation='relu', padding='same')(up8)
+    conv8 = Conv1D(64, 6, activation='relu', padding='same')(conv8)
 
     up_conv8 = UpSampling1D(size=2)(conv8)
     ch = get_crop_shape(conv1, up_conv8)
     crop_conv1 = Cropping1D(cropping=(ch))(conv1)
     up9 = concatenate([up_conv8, crop_conv1], axis=concat_axis)
-    conv9 = Conv1D(512, 6, activation='relu', padding='same')(up9)
-    conv9 = Conv1D(512, 6, activation='relu', padding='same')(conv9)
+    conv9 = Conv1D(64, 6, activation='relu', padding='same')(up9)
+    conv9 = Conv1D(64, 6, activation='relu', padding='same')(conv9)
 
     ch = get_crop_shape(inputs, conv9)
     conv9 = ZeroPadding1D(padding=((ch[0], ch[1])))(conv9)
@@ -469,7 +469,7 @@ def unet():
 
 ##################################################################
 ##################################################################
-split_size = 1000
+split_size = 1024
 qtdbpath = "data\\qt-database-1.0.0\\"  ## first argument = qtdb database from physionet.
 perct = 0.9 # percentage training
 percv = 0.1 # percentage validation
@@ -497,8 +497,8 @@ from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 # ----------------------------------------------
 # set info
-epochs = 8
-model_name = 'unet_' + annot_type + "_" + str(epochs) + '.h5'
+epochs = 20
+model_name = 'unet_real_' + annot_type + "_" + str(epochs) + '.h5'
 # ----------------------------------------------
 with tf.device('/gpu:0'):  # switch to /cpu:0 to use cpu
     if not os.path.isfile(model_name):
